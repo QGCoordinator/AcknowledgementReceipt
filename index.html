@@ -134,24 +134,6 @@
         .add-item-container button:hover {
             background-color: #45a049;
         }
-        .auth-code-container {
-            margin-top: 0.2in;
-            padding: 0.2in;
-            background-color: #f0f0f0;
-            border-radius: 5px;
-            width: 100%;
-            max-width: 8.5in;
-        }
-        .auth-code-container label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 0.1in;
-        }
-        .auth-code-container input {
-            padding: 0.1in;
-            font-size: 12px;
-            width: 200px;
-        }
         @media print {
             body {
                 margin: 0;
@@ -163,7 +145,7 @@
                 padding: 0.25in;
                 border: none;
             }
-            .input-section, .add-group-container, .auth-code-container {
+            .input-section, .add-group-container {
                 display: none;
             }
             .receipt h2 {
@@ -182,12 +164,6 @@
     </style>
 </head>
 <body>
-    <!-- Authentication Code Section -->
-    <div class="auth-code-container">
-        <label for="authCode">Authentication Code:</label>
-        <input type="password" id="authCode" placeholder="Enter authentication code">
-    </div>
-
     <!-- Input Section -->
     <div class="input-section">
         <div>
@@ -393,24 +369,7 @@
     </div>
 
     <script>
-        // Define the correct authentication code
-        const CORRECT_AUTH_CODE = "QUINTILLA123"; // Change this to your desired code
-
-        function checkAuthCode() {
-            const enteredCode = document.getElementById('authCode').value;
-            if (enteredCode !== CORRECT_AUTH_CODE) {
-                alert("Invalid authentication code. Please try again.");
-                return false;
-            }
-            return true;
-        }
-
         function updateReceipt() {
-            // First check authentication code
-            if (!checkAuthCode()) {
-                return;
-            }
-
             // Get input values
             const salutation = document.getElementById('salutation').value;
             const name = document.getElementById('name').value || "[Name]";
@@ -477,11 +436,6 @@
         }
 
         function addGroup() {
-            // First check authentication code
-            if (!checkAuthCode()) {
-                return;
-            }
-
             const newGroupInput = document.getElementById('newGroup');
             const groupName = newGroupInput.value.trim();
             
