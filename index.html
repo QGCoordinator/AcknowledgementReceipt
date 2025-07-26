@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acknowledgement Receipt</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9f9f9;
+        }
+        .receipt {
+            width: 8.5in; /* 8.5 inches width */
+            height: 5.5in; /* Half of 11 inches height (crosswise) */
+            padding: 0.25in;
+            box-sizing: border-box;
+            border: 1px solid #000;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .receipt h2 {
+            text-align: center;
+            margin: 0 0 0.1in 0;
+            font-size: 14px;
+        }
+        .receipt table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0.1in;
+            font-size: 10px;
+        }
+        .receipt table, .receipt th, .receipt td {
+            border: 1px solid #000;
+        }
+        .receipt th, .receipt td {
+            padding: 0.1in;
+            text-align: left;
+        }
+        .receipt .signature {
+            margin-top: 0.1in;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+        }
+        .receipt .signature div {
+            width: 45%;
+        }
+        .receipt .footer {
+            text-align: left;
+            margin-top: 0.1in;
+            font-size: 8px;
+        }
+        .receipt .footer p {
+            margin: 0.05in 0;
+        }
+        .receipt .bold {
+            font-weight: bold;
+        }
+        .receipt .center {
+            text-align: center;
+        }
+        .input-section {
+            margin-bottom: 0.1in;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.1in;
+            font-size: 12px;
+        }
+        .input-section label {
+            font-weight: bold;
+            margin-right: 0.1in;
+        }
+        .input-section input, .input-section select {
+            padding: 0.1in;
+            font-size: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .remarks {
+            margin-top: 0.1in;
+            font-size: 12px;
+        }
+        .remarks label {
+            font-weight: bold;
+        }
+        .remarks input {
+            padding: 0.1in;
+            font-size: 12px;
+            width: 100%;
+            max-width: 300px;
+            display: none; /* Hide the Agent input box */
+        }
+        .agent-name {
+            font-weight: bold;
+            margin-top: 0.1in;
+        }
+        .space-after-received {
+            margin-bottom: 0.5in;
+        }
+        .cutting-line {
+            text-align: center;
+            margin: 0.2in 0;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .add-item-container {
+            display: flex;
+            align-items: center;
+            margin-top: 0.1in;
+        }
+        .add-item-container input {
+            flex: 1;
+            padding: 0.1in;
+            font-size: 12px;
+            margin-right: 0.1in;
+        }
+        .add-item-container button {
+            padding: 0.1in 0.2in;
+            font-size: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .add-item-container button:hover {
+            background-color: #45a049;
+        }
+        .auth-code-container {
+            margin-top: 0.2in;
+            padding: 0.2in;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 8.5in;
+        }
+        .auth-code-container label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 0.1in;
+        }
+        .auth-code-container input {
+            padding: 0.1in;
+            font-size: 12px;
+            width: 200px;
+        }
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .receipt {
+                width: 8.5in;
+                height: 5.5in;
+                padding: 0.25in;
+                border: none;
+            }
+            .input-section, .add-group-container, .auth-code-container {
+                display: none;
+            }
+            .receipt h2 {
+                font-size: 14px;
+            }
+            .receipt table {
+                font-size: 10px;
+            }
+            .receipt .signature {
+                font-size: 10px;
+            }
+            .receipt .footer {
+                font-size: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Authentication Code Section -->
+    <div class="auth-code-container">
+        <label for="authCode">Authentication Code:</label>
+        <input type="password" id="authCode" placeholder="Enter authentication code">
+    </div>
+
+    <!-- Input Section -->
+    <div class="input-section">
+        <div>
+            <label for="salutation">Salutation:</label>
+            <select id="salutation" oninput="updateReceipt()">
+                <option value="MR.">MR.</option>
+                <option value="MS.">MS.</option>
+            </select>
+        </div>
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="Enter Name" oninput="updateReceipt()">
+        </div>
+        <div>
+            <label for="reservationAmount">Reservation Amount:</label>
+            <input type="text" id="reservationAmount" placeholder="Enter Reservation Amount" oninput="updateReceipt()">
+        </div>
+        <div>
+            <label for="equity">Equity (Optional):</label>
+            <input type="text" id="equity" placeholder="Enter Equity Amount" oninput="updateReceipt()">
+        </div>
+        <div>
+            <label for="date">Date:</label>
+            <input type="date" id="date" oninput="updateReceipt()">
+        </div>
+        <div>
+            <label for="particular">Particular:</label>
+            <input type="text" id="particular" placeholder="Enter Particular (e.g., 1 REG UNIT – DHSS P2)" oninput="updateReceipt()">
+        </div>
+        <div>
+            <label for="modeOfPayment">Mode of Payment:</label>
+            <select id="modeOfPayment" oninput="updateReceipt()">
+                <option value="CASH">CASH</option>
+                <option value="CHEQUE">CHEQUE</option>
+                <option value="BANK TRANSFER">BANK TRANSFER</option>
+            </select>
+        </div>
+        <div>
+            <label for="agent">Agent:</label>
+            <input type="text" id="agent" placeholder="Enter Agent Name" oninput="updateReceipt()">
+        </div>
+        <div>
+            <label for="group">Group:</label>
+            <select id="group" oninput="updateReceipt()">
+                <option value="">Select Group</option>
+                <option value="TEAM AMPATIN">TEAM AMPATIN</option>
+                <option value="TEAM BULAHAN">TEAM BULAHAN</option>
+                <option value="TEAM GUILLERMO">TEAM GUILLERMO</option>
+                <option value="TEAM JEKYPRO">TEAM JEKYPRO</option>
+                <option value="TEAM MARIA">TEAM MARIA</option>
+                <option value="TEAM UMADHAY">TEAM UMADHAY</option>
+                <option value="UM DIRECT">UM DIRECT</option>
+                <option value="UM EAGLES">UM EAGLES</option>
+                <option value="UM ELITE">UM ELITE</option>
+                <option value="UM OPEN GROUP - HIGH FLYERS">UM OPEN GROUP - HIGH FLYERS</option>
+                <option value="UM OPEN GROUP - KEYSTONE">UM OPEN GROUP - KEYSTONE</option>
+                <option value="UM OPEN GROUP - ACUYADO">UM OPEN GROUP - ACUYADO</option>
+                <option value="UM OPEN GROUP - JAVA">UM OPEN GROUP - JAVA</option>
+                <option value="UM OPEN GROUP - IREB">UM OPEN GROUP - IREB</option>
+                <option value="UM OPEN GROUP - A+">UM OPEN GROUP - A+</option>
+                <option value="UM OPEN GROUP - DORONILA">UM OPEN GROUP - DORONILA</option>
+                <option value="UM OPEN GROUP - BODIOLA">UM OPEN GROUP - BODIOLA</option>
+                <option value="UM OPEN GROUP - ONE ZION">UM OPEN GROUP - ONE ZION</option>
+                <option value="UM OPEN GROUP - GOLDKEY">UM OPEN GROUP - GOLDKEY</option>
+                <option value="UM OPEN GROUP - VRTX">UM OPEN GROUP - VRTX</option>
+                <option value="UM OPEN GROUP - RACFINI8TY">UM OPEN GROUP - RACFINI8TY</option>
+                <option value="UM OPEN GROUP - JDV GROUP">UM OPEN GROUP - JDV GROUP</option>
+                <option value="UM PERSONAL">UM PERSONAL</option>
+            </select>
+            <div class="add-item-container" id="addGroupContainer">
+                <input type="text" id="newGroup" placeholder="New group name">
+                <button onclick="addGroup()">Add Group</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Copy -->
+    <div class="receipt">
+        <div class="footer">
+            <p class="bold">QUINTILLA GROUP</p>
+            <p>Door 3 & 4 Iloilo New Life Commercial Building</p>
+            <p>Mabini Corner Texas St., Sampaguita Iloilo City 5000</p>
+            <p>Tel. No.: 500-2527</p>
+        </div>
+
+        <h2 class="center">ACKNOWLEDGEMENT RECEIPT (CLIENT COPY)</h2>
+
+        <p>This is to acknowledge the payment from <span class="bold" id="receiptName">[Salutation] [Name]</span> the total amount of <span class="bold" id="receiptAmount">[Amount]</span> as payment for the following:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Mode of Payment</th>
+                    <th>Amount</th>
+                    <th>Particular</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="tableModeOfPayment">[Mode of Payment]</td>
+                    <td id="tableReservationAmount">[Reservation Amount]</td>
+                    <td id="tableParticular">RESERVATION PAYMENT (HOLDING FEE) <span id="dynamicParticular">[Particular]</span></td>
+                    <td id="tableDate">[Date]</td>
+                </tr>
+                <!-- Optional Equity Row -->
+                <tr id="equityRow" style="display: none;">
+                    <td id="equityModeOfPayment">[Mode of Payment]</td>
+                    <td id="equityAmount">[Equity Amount]</td>
+                    <td id="equityParticular">EQUITY</td>
+                    <td id="equityDate">[Date]</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="signature">
+            <div>
+                <p>Received by:</p>
+                <div class="space-after-received"></div>
+                <p class="bold">DEAN VICTOR L. MONTALVO</p>
+                <p>Accounting In-charge</p>
+            </div>
+            <div>
+                <p>Noted by:</p>
+                <div class="space-after-received"></div>
+                <p class="bold">LOIDA S. QUINTILLA</p>
+                <p>Unit Manager</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p class="center">***This is NOT an Official Receipt; this only serves as Temporary Receipt; subject for Office Common Expense deduction once backed-out***</p>
+        </div>
+    </div>
+
+    <!-- Cutting Line -->
+    <div class="cutting-line">
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    </div>
+
+    <!-- Office Copy -->
+    <div class="receipt">
+        <div class="footer">
+            <p class="bold">QUINTILLA GROUP</p>
+            <p>Door 3 & 4 Iloilo New Life Commercial Building</p>
+            <p>Mabini Corner Texas St., Sampaguita Iloilo City 5000</p>
+            <p>Tel. No.: 500-2527</p>
+        </div>
+
+        <h2 class="center">ACKNOWLEDGEMENT RECEIPT (OFFICE COPY)</h2>
+
+        <p>This is to acknowledge the payment from <span class="bold" id="receiptName2">[Salutation] [Name]</span> the total amount of <span class="bold" id="receiptAmount2">[Amount]</span> as payment for the following:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Mode of Payment</th>
+                    <th>Amount</th>
+                    <th>Particular</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="tableModeOfPayment2">[Mode of Payment]</td>
+                    <td id="tableReservationAmount2">[Reservation Amount]</td>
+                    <td id="tableParticular2">RESERVATION PAYMENT (HOLDING FEE) <span id="dynamicParticular2">[Particular]</span></td>
+                    <td id="tableDate2">[Date]</td>
+                </tr>
+                <!-- Optional Equity Row -->
+                <tr id="equityRow2" style="display: none;">
+                    <td id="equityModeOfPayment2">[Mode of Payment]</td>
+                    <td id="equityAmount2">[Equity Amount]</td>
+                    <td id="equityParticular2">EQUITY</td>
+                    <td id="equityDate2">[Date]</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Display Agent's Name and Group -->
+        <div class="agent-name">
+            Agent: <span id="displayAgent">[Agent Name]</span> | Group: <span id="displayGroup">[Group]</span>
+        </div>
+
+        <div class="signature">
+            <div>
+                <p>Received by:</p>
+                <div class="space-after-received"></div>
+                <p class="bold">DEAN VICTOR L. MONTALVO</p>
+                <p>Accounting In-charge</p>
+            </div>
+            <div>
+                <p>Noted by:</p>
+                <div class="space-after-received"></div>
+                <p class="bold">LOIDA S. QUINTILLA</p>
+                <p>Unit Manager</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p class="center">***This is NOT an Official Receipt; this only serves as Temporary Receipt; subject for Office Common Expense deduction once backed-out***</p>
+        </div>
+    </div>
+
+    <script>
+        // Define the correct authentication code
+        const CORRECT_AUTH_CODE = "QUINTILLA123"; // Change this to your desired code
+
+        function checkAuthCode() {
+            const enteredCode = document.getElementById('authCode').value;
+            if (enteredCode !== CORRECT_AUTH_CODE) {
+                alert("Invalid authentication code. Please try again.");
+                return false;
+            }
+            return true;
+        }
+
+        function updateReceipt() {
+            // First check authentication code
+            if (!checkAuthCode()) {
+                return;
+            }
+
+            // Get input values
+            const salutation = document.getElementById('salutation').value;
+            const name = document.getElementById('name').value || "[Name]";
+            const reservationAmount = document.getElementById('reservationAmount').value || "0";
+            const equity = document.getElementById('equity').value || "0";
+            const date = document.getElementById('date').value;
+            const particular = document.getElementById('particular').value || "[Particular]";
+            const modeOfPayment = document.getElementById('modeOfPayment').value || "[Mode of Payment]";
+            const agent = document.getElementById('agent').value || "[Agent Name]";
+            const group = document.getElementById('group').value || "[Group]";
+
+            // Format the date
+            const formattedDate = date ? new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase() : "[Date]";
+
+            // Convert amounts to numbers
+            const reservationAmountNum = parseFloat(reservationAmount) || 0;
+            const equityNum = parseFloat(equity) || 0;
+
+            // Calculate total amount
+            const totalAmount = reservationAmountNum + equityNum;
+
+            // Add Philippine Peso sign (₱) to the amounts
+            const formattedReservationAmount = reservationAmountNum ? `₱ ${reservationAmountNum.toLocaleString()}` : "[Reservation Amount]";
+            const formattedEquity = equityNum ? `₱ ${equityNum.toLocaleString()}` : "";
+            const formattedTotalAmount = totalAmount ? `₱ ${totalAmount.toLocaleString()}` : "[Amount]";
+
+            // Update the receipt content
+            const fullName = `${salutation} ${name}`;
+            document.getElementById('receiptName').textContent = fullName;
+            document.getElementById('receiptAmount').textContent = formattedTotalAmount;
+            document.getElementById('tableModeOfPayment').textContent = modeOfPayment;
+            document.getElementById('tableReservationAmount').textContent = formattedReservationAmount;
+            document.getElementById('dynamicParticular').textContent = particular;
+            document.getElementById('tableDate').textContent = formattedDate;
+
+            // Update the second receipt content
+            document.getElementById('receiptName2').textContent = fullName;
+            document.getElementById('receiptAmount2').textContent = formattedTotalAmount;
+            document.getElementById('tableModeOfPayment2').textContent = modeOfPayment;
+            document.getElementById('tableReservationAmount2').textContent = formattedReservationAmount;
+            document.getElementById('dynamicParticular2').textContent = particular;
+            document.getElementById('tableDate2').textContent = formattedDate;
+
+            // Update the Agent's name and Group
+            document.getElementById('displayAgent').textContent = agent;
+            document.getElementById('displayGroup').textContent = group;
+
+            // Update Equity Row (if equity is provided)
+            const equityRow = document.getElementById('equityRow');
+            const equityRow2 = document.getElementById('equityRow2');
+            if (equityNum > 0) {
+                equityRow.style.display = "table-row";
+                equityRow2.style.display = "table-row";
+                document.getElementById('equityModeOfPayment').textContent = modeOfPayment;
+                document.getElementById('equityAmount').textContent = formattedEquity;
+                document.getElementById('equityDate').textContent = formattedDate;
+                document.getElementById('equityModeOfPayment2').textContent = modeOfPayment;
+                document.getElementById('equityAmount2').textContent = formattedEquity;
+                document.getElementById('equityDate2').textContent = formattedDate;
+            } else {
+                equityRow.style.display = "none";
+                equityRow2.style.display = "none";
+            }
+        }
+
+        function addGroup() {
+            // First check authentication code
+            if (!checkAuthCode()) {
+                return;
+            }
+
+            const newGroupInput = document.getElementById('newGroup');
+            const groupName = newGroupInput.value.trim();
+            
+            if (groupName) {
+                const groupSelect = document.getElementById('group');
+                
+                // Create a new option
+                const newOption = document.createElement('option');
+                newOption.value = groupName;
+                newOption.textContent = groupName;
+                
+                // Add the new option to the select element
+                groupSelect.appendChild(newOption);
+                
+                // Select the new option
+                groupSelect.value = groupName;
+                
+                // Update the receipt
+                updateReceipt();
+                // Clear the input field
+                newGroupInput.value = '';
+            }
+        }
+
+        // Initialize with empty receipt
+        updateReceipt();
+    </script>
+</body>
+</html>
