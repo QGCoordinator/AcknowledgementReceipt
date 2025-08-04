@@ -134,6 +134,18 @@
         .add-item-container button:hover {
             background-color: #45a049;
         }
+        .office-only-input {
+            margin-top: 0.1in;
+            font-size: 12px;
+        }
+        .office-only-input label {
+            font-weight: bold;
+        }
+        .payment-given-by {
+            font-weight: bold;
+            margin-top: 0.1in;
+            font-size: 12px;
+        }
         @media print {
             body {
                 margin: 0;
@@ -145,7 +157,7 @@
                 padding: 0.25in;
                 border: none;
             }
-            .input-section, .add-group-container {
+            .input-section, .add-group-container, .office-only-input {
                 display: none;
             }
             .receipt h2 {
@@ -159,6 +171,9 @@
             }
             .receipt .footer {
                 font-size: 8px;
+            }
+            .payment-given-by {
+                display: block !important;
             }
         }
     </style>
@@ -238,6 +253,15 @@
                 <button onclick="addGroup()">Add Group</button>
             </div>
         </div>
+    </div>
+
+    <!-- Payment Given By Input (Office Copy Only) -->
+    <div class="office-only-input">
+        <label for="paymentGivenBy">PAYMENT GIVEN BY (Office Copy Only):</label>
+        <select id="paymentGivenBy" oninput="updateReceipt()">
+            <option value="BUYER">BUYER</option>
+            <option value="SELLER">SELLER</option>
+        </select>
     </div>
 
     <!-- Client Copy -->
@@ -348,6 +372,11 @@
             Agent: <span id="displayAgent">[Agent Name]</span> | Group: <span id="displayGroup">[Group]</span>
         </div>
 
+        <!-- Payment Given By (Office Copy Only) -->
+        <div class="payment-given-by">
+            PAYMENT GIVEN BY: <span id="displayPaymentGivenBy">BUYER</span>
+        </div>
+
         <div class="signature">
             <div>
                 <p>Received by:</p>
@@ -380,6 +409,7 @@
             const modeOfPayment = document.getElementById('modeOfPayment').value || "[Mode of Payment]";
             const agent = document.getElementById('agent').value || "[Agent Name]";
             const group = document.getElementById('group').value || "[Group]";
+            const paymentGivenBy = document.getElementById('paymentGivenBy').value || "BUYER";
 
             // Format the date
             const formattedDate = date ? new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase() : "[Date]";
@@ -416,6 +446,9 @@
             // Update the Agent's name and Group
             document.getElementById('displayAgent').textContent = agent;
             document.getElementById('displayGroup').textContent = group;
+
+            // Update Payment Given By
+            document.getElementById('displayPaymentGivenBy').textContent = paymentGivenBy;
 
             // Update Equity Row (if equity is provided)
             const equityRow = document.getElementById('equityRow');
