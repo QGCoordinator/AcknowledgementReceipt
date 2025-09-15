@@ -9,16 +9,30 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background-color: #f9f9f9;
+            background-color: #f0f8ff;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .input-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
         .receipt {
-            width: 8.5in; /* 8.5 inches width */
-            height: 5.5in; /* Half of 11 inches height (crosswise) */
+            width: 8.5in;
+            height: 5.5in;
             padding: 0.25in;
             box-sizing: border-box;
             border: 1px solid #000;
@@ -26,6 +40,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            margin-bottom: 20px;
         }
         .receipt h2 {
             text-align: center;
@@ -35,7 +50,7 @@
         .receipt table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 0.1in;
+            margin-bottom: 0.05in;
             font-size: 10px;
         }
         .receipt table, .receipt th, .receipt td {
@@ -46,7 +61,6 @@
             text-align: left;
         }
         .receipt .signature {
-            margin-top: 0.1in;
             display: flex;
             justify-content: space-between;
             font-size: 10px;
@@ -57,7 +71,7 @@
         .receipt .footer {
             text-align: left;
             margin-top: 0.1in;
-            font-size: 8px;
+            font-size: 9px;
         }
         .receipt .footer p {
             margin: 0.05in 0;
@@ -68,43 +82,36 @@
         .receipt .center {
             text-align: center;
         }
-        .input-section {
-            margin-bottom: 0.1in;
+        .input-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 0.1in;
+            gap: 15px;
             font-size: 12px;
         }
-        .input-section label {
-            font-weight: bold;
-            margin-right: 0.1in;
+        .input-group {
+            display: flex;
+            flex-direction: column;
         }
-        .input-section input, .input-section select {
-            padding: 0.1in;
+        .input-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .input-group input, .input-group select {
+            padding: 10px;
             font-size: 12px;
             width: 100%;
             box-sizing: border-box;
-        }
-        .remarks {
-            margin-top: 0.1in;
-            font-size: 12px;
-        }
-        .remarks label {
-            font-weight: bold;
-        }
-        .remarks input {
-            padding: 0.1in;
-            font-size: 12px;
-            width: 100%;
-            max-width: 300px;
-            display: none; /* Hide the Agent input box */
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
         .agent-name {
             font-weight: bold;
-            margin-top: 0.1in;
+            margin-top: 0.05in;
+            font-size: 10px;
+            margin-bottom: 0.05in;
         }
         .space-after-received {
-            margin-bottom: 0.5in;
+            margin-bottom: 0.2in;
         }
         .cutting-line {
             text-align: center;
@@ -130,273 +137,271 @@
             color: white;
             border: none;
             cursor: pointer;
+            border-radius: 4px;
         }
         .add-item-container button:hover {
             background-color: #45a049;
         }
-        .office-only-input {
-            margin-top: 0.1in;
-            font-size: 12px;
-        }
-        .office-only-input label {
+        .name-agent {
             font-weight: bold;
+            font-size: 11px;
+            margin-bottom: 0.01in;
         }
-        .payment-given-by {
-            font-weight: bold;
-            margin-top: 0.1in;
-            font-size: 12px;
+        .print-button {
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .print-button:hover {
+            background-color: #0069d9;
         }
         @media print {
             body {
                 margin: 0;
                 padding: 0;
+                background-color: white;
+            }
+            .input-section, .print-button {
+                display: none;
             }
             .receipt {
                 width: 8.5in;
                 height: 5.5in;
                 padding: 0.25in;
                 border: none;
+                page-break-after: always;
             }
-            .input-section, .add-group-container, .office-only-input {
+            .container {
+                max-width: 100%;
+            }
+            .cutting-line {
                 display: none;
-            }
-            .receipt h2 {
-                font-size: 14px;
-            }
-            .receipt table {
-                font-size: 10px;
-            }
-            .receipt .signature {
-                font-size: 10px;
-            }
-            .receipt .footer {
-                font-size: 8px;
-            }
-            .payment-given-by {
-                display: block !important;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Input Section -->
-    <div class="input-section">
-        <div>
-            <label for="salutation">Salutation:</label>
-            <select id="salutation" oninput="updateReceipt()">
-                <option value="MR.">MR.</option>
-                <option value="MS.">MS.</option>
-            </select>
-        </div>
-        <div>
-            <label for="name">Name:</label>
-            <input type="text" id="name" placeholder="Enter Name" oninput="updateReceipt()">
-        </div>
-        <div>
-            <label for="reservationAmount">Reservation Amount:</label>
-            <input type="text" id="reservationAmount" placeholder="Enter Reservation Amount" oninput="updateReceipt()">
-        </div>
-        <div>
-            <label for="equity">Equity (Optional):</label>
-            <input type="text" id="equity" placeholder="Enter Equity Amount" oninput="updateReceipt()">
-        </div>
-        <div>
-            <label for="date">Date:</label>
-            <input type="date" id="date" oninput="updateReceipt()">
-        </div>
-        <div>
-            <label for="particular">Particular:</label>
-            <input type="text" id="particular" placeholder="Enter Particular (e.g., 1 REG UNIT – DHSS P2)" oninput="updateReceipt()">
-        </div>
-        <div>
-            <label for="modeOfPayment">Mode of Payment:</label>
-            <select id="modeOfPayment" oninput="updateReceipt()">
-                <option value="CASH">CASH</option>
-                <option value="CHEQUE">CHEQUE</option>
-                <option value="BANK TRANSFER">BANK TRANSFER</option>
-            </select>
-        </div>
-        <div>
-            <label for="agent">Agent:</label>
-            <input type="text" id="agent" placeholder="Enter Agent Name" oninput="updateReceipt()">
-        </div>
-        <div>
-            <label for="group">Group:</label>
-            <select id="group" oninput="updateReceipt()">
-                <option value="">Select Group</option>
-                <option value="TEAM AMPATIN">TEAM AMPATIN</option>
-                <option value="TEAM BULAHAN">TEAM BULAHAN</option>
-                <option value="TEAM GUILLERMO">TEAM GUILLERMO</option>
-                <option value="TEAM JEKYPRO">TEAM JEKYPRO</option>
-                <option value="TEAM MARIA">TEAM MARIA</option>
-                <option value="TEAM UMADHAY">TEAM UMADHAY</option>
-                <option value="UM DIRECT">UM DIRECT</option>
-                <option value="UM EAGLES">UM EAGLES</option>
-                <option value="UM ELITE">UM ELITE</option>
-                <option value="UM OPEN GROUP - HIGH FLYERS">UM OPEN GROUP - HIGH FLYERS</option>
-                <option value="UM OPEN GROUP - KEYSTONE">UM OPEN GROUP - KEYSTONE</option>
-                <option value="UM OPEN GROUP - ACUYADO">UM OPEN GROUP - ACUYADO</option>
-                <option value="UM OPEN GROUP - JAVA">UM OPEN GROUP - JAVA</option>
-                <option value="UM OPEN GROUP - IREB">UM OPEN GROUP - IREB</option>
-                <option value="UM OPEN GROUP - A+">UM OPEN GROUP - A+</option>
-                <option value="UM OPEN GROUP - DORONILA">UM OPEN GROUP - DORONILA</option>
-                <option value="UM OPEN GROUP - BODIOLA">UM OPEN GROUP - BODIOLA</option>
-                <option value="UM OPEN GROUP - ONE ZION">UM OPEN GROUP - ONE ZION</option>
-                <option value="UM OPEN GROUP - GOLDKEY">UM OPEN GROUP - GOLDKEY</option>
-                <option value="UM OPEN GROUP - VRTX">UM OPEN GROUP - VRTX</option>
-                <option value="UM OPEN GROUP - RACFINI8TY">UM OPEN GROUP - RACFINI8TY</option>
-                <option value="UM OPEN GROUP - JDV GROUP">UM OPEN GROUP - JDV GROUP</option>
-                <option value="UM PERSONAL">UM PERSONAL</option>
-            </select>
-            <div class="add-item-container" id="addGroupContainer">
-                <input type="text" id="newGroup" placeholder="New group name">
-                <button onclick="addGroup()">Add Group</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Payment Given By Input (Office Copy Only) -->
-    <div class="office-only-input">
-        <label for="paymentGivenBy">PAYMENT GIVEN BY (Office Copy Only):</label>
-        <select id="paymentGivenBy" oninput="updateReceipt()">
-            <option value="BUYER">BUYER</option>
-            <option value="SELLER">SELLER</option>
-        </select>
-    </div>
-
-    <!-- Client Copy -->
-    <div class="receipt">
-        <div class="footer">
-            <p class="bold">QUINTILLA GROUP</p>
-            <p>Door 3 & 4 Iloilo New Life Commercial Building</p>
-            <p>Mabini Corner Texas St., Sampaguita Iloilo City 5000</p>
-            <p>Tel. No.: 500-2527</p>
-        </div>
-
-        <h2 class="center">ACKNOWLEDGEMENT RECEIPT (CLIENT COPY)</h2>
-
-        <p>This is to acknowledge the payment from <span class="bold" id="receiptName">[Salutation] [Name]</span> the total amount of <span class="bold" id="receiptAmount">[Amount]</span> as payment for the following:</p>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Mode of Payment</th>
-                    <th>Amount</th>
-                    <th>Particular</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td id="tableModeOfPayment">[Mode of Payment]</td>
-                    <td id="tableReservationAmount">[Reservation Amount]</td>
-                    <td id="tableParticular">RESERVATION PAYMENT (HOLDING FEE) <span id="dynamicParticular">[Particular]</span></td>
-                    <td id="tableDate">[Date]</td>
-                </tr>
-                <!-- Optional Equity Row -->
-                <tr id="equityRow" style="display: none;">
-                    <td id="equityModeOfPayment">[Mode of Payment]</td>
-                    <td id="equityAmount">[Equity Amount]</td>
-                    <td id="equityParticular">EQUITY</td>
-                    <td id="equityDate">[Date]</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="signature">
-            <div>
-                <p>Received by:</p>
-                <div class="space-after-received"></div>
-                <p class="bold">DEAN VICTOR L. MONTALVO</p>
-                <p>Accounting In-charge</p>
-            </div>
-            <div>
-                <p>Noted by:</p>
-                <div class="space-after-received"></div>
-                <p class="bold">LOIDA S. QUINTILLA</p>
-                <p>Unit Manager</p>
+    <div class="container">
+        <!-- Input Section -->
+        <div class="input-section">
+            <h2>Receipt Details</h2>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="salutation">Salutation:</label>
+                    <select id="salutation" oninput="updateReceipt()">
+                        <option value="MR.">MR.</option>
+                        <option value="MS.">MS.</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" placeholder="Enter Name" oninput="updateReceipt()">
+                </div>
+                <div class="input-group">
+                    <label for="reservationAmount">Reservation Amount:</label>
+                    <input type="text" id="reservationAmount" placeholder="Enter Reservation Amount" oninput="updateReceipt()">
+                </div>
+                <div class="input-group">
+                    <label for="equity">Equity (Optional):</label>
+                    <input type="text" id="equity" placeholder="Enter Equity Amount" oninput="updateReceipt()">
+                </div>
+                <div class="input-group">
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" oninput="updateReceipt()">
+                </div>
+                <div class="input-group">
+                    <label for="particular">Particular:</label>
+                    <input type="text" id="particular" placeholder="Enter Particular (e.g., 1 REG UNIT – DHSS P2)" oninput="updateReceipt()">
+                </div>
+                <div class="input-group">
+                    <label for="modeOfPayment">Mode of Payment:</label>
+                    <select id="modeOfPayment" oninput="updateReceipt()">
+                        <option value="CASH">CASH</option>
+                        <option value="CHEQUE">CHEQUE</option>
+                        <option value="BANK TRANSFER">BANK TRANSFER</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="agent">Agent:</label>
+                    <input type="text" id="agent" placeholder="Enter Agent Name" oninput="updateReceipt()">
+                </div>
+                <div class="input-group">
+                    <label for="group">Group:</label>
+                    <select id="group" oninput="updateReceipt()">
+                        <option value="">Select Group</option>
+                        <option value="TEAM AMPATIN">TEAM AMPATIN</option>
+                        <option value="TEAM BULAHAN">TEAM BULAHAN</option>
+                        <option value="TEAM GUILLERMO">TEAM GUILLERMO</option>
+                        <option value="TEAM JEKYPRO">TEAM JEKYPRO</option>
+                        <option value="TEAM MARIA">TEAM MARIA</option>
+                        <option value="TEAM UMADHAY">TEAM UMADHAY</option>
+                        <option value="UM DIRECT">UM DIRECT</option>
+                        <option value="UM EAGLES">UM EAGLES</option>
+                        <option value="UM ELITE">UM ELITE</option>
+                        <option value="UM OPEN GROUP - HIGH FLYERS">UM OPEN GROUP - HIGH FLYERS</option>
+                        <option value="UM OPEN GROUP - KEYSTONE">UM OPEN GROUP - KEYSTONE</option>
+                        <option value="UM OPEN GROUP - ACUYADO">UM OPEN GROUP - ACUYADO</option>
+                        <option value="UM OPEN GROUP - JAVA">UM OPEN GROUP - JAVA</option>
+                        <option value="UM OPEN GROUP - IREB">UM OPEN GROUP - IREB</option>
+                        <option value="UM OPEN GROUP - A+">UM OPEN GROUP - A+</option>
+                        <option value="UM OPEN GROUP - DORONILA">UM OPEN GROUP - DORONILA</option>
+                        <option value="UM OPEN GROUP - BODIOLA">UM OPEN GROUP - BODIOLA</option>
+                        <option value="UM OPEN GROUP - ONE ZION">UM OPEN GROUP - ONE ZION</option>
+                        <option value="UM OPEN GROUP - GOLDKEY">UM OPEN GROUP - GOLDKEY</option>
+                        <option value="UM OPEN GROUP - VRTX">UM OPEN GROUP - VRTX</option>
+                        <option value="UM OPEN GROUP - RACFINI8TY">UM OPEN GROUP - RACFINI8TY</option>
+                        <option value="UM OPEN GROUP - JDV GROUP">UM OPEN GROUP - JDV GROUP</option>
+                        <option value="UM PERSONAL">UM PERSONAL</option>
+                    </select>
+                    <div class="add-item-container" id="addGroupContainer">
+                        <input type="text" id="newGroup" placeholder="New group name">
+                        <button onclick="addGroup()">Add Group</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="footer">
-            <p class="center">This is a temporary receipt only. The reservation fee secures my intent to acquire a property and process a loan with Deca Homes Iloilo (8990 Housing).
-I agree that once that I will backout it will result to a non-refundable processing fee: ₱1,000 for Economic Units or ₱500 for Socialized Units.</p>
-        </div>
-    </div>
-
-    <!-- Cutting Line -->
-    <div class="cutting-line">
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    </div>
-
-    <!-- Office Copy -->
-    <div class="receipt">
-        <div class="footer">
-            <p class="bold">QUINTILLA GROUP</p>
-            <p>Door 3 & 4 Iloilo New Life Commercial Building</p>
-            <p>Mabini Corner Texas St., Sampaguita Iloilo City 5000</p>
-            <p>Tel. No.: 500-2527</p>
-        </div>
-
-        <h2 class="center">ACKNOWLEDGEMENT RECEIPT (OFFICE COPY)</h2>
-
-        <p>This is to acknowledge the payment from <span class="bold" id="receiptName2">[Salutation] [Name]</span> the total amount of <span class="bold" id="receiptAmount2">[Amount]</span> as payment for the following:</p>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Mode of Payment</th>
-                    <th>Amount</th>
-                    <th>Particular</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td id="tableModeOfPayment2">[Mode of Payment]</td>
-                    <td id="tableReservationAmount2">[Reservation Amount]</td>
-                    <td id="tableParticular2">RESERVATION PAYMENT (HOLDING FEE) <span id="dynamicParticular2">[Particular]</span></td>
-                    <td id="tableDate2">[Date]</td>
-                </tr>
-                <!-- Optional Equity Row -->
-                <tr id="equityRow2" style="display: none;">
-                    <td id="equityModeOfPayment2">[Mode of Payment]</td>
-                    <td id="equityAmount2">[Equity Amount]</td>
-                    <td id="equityParticular2">EQUITY</td>
-                    <td id="equityDate2">[Date]</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!-- Display Agent's Name and Group -->
-        <div class="agent-name">
-            Agent: <span id="displayAgent">[Agent Name]</span> | Group: <span id="displayGroup">[Group]</span>
-        </div>
-
-        <!-- Payment Given By (Office Copy Only) -->
-        <div class="payment-given-by">
-            PAYMENT GIVEN BY: <span id="displayPaymentGivenBy">BUYER</span>
-        </div>
-
-        <div class="signature">
-            <div>
-                <p>Received by:</p>
-                <div class="space-after-received"></div>
-                <p class="bold">DEAN VICTOR L. MONTALVO</p>
-                <p>Accounting In-charge</p>
+        <!-- Client Copy -->
+        <div class="receipt">
+            <div class="footer">
+                <p class="bold">QUINTILLA GROUP</p>
+                <p>Door 3 & 4 Iloilo New Life Commercial Building</p>
+                <p>Mabini Corner Texas St., Sampaguita Iloilo City 5000</p>
+                <p>Tel. No.: 500-2527</p>
             </div>
-            <div>
-                <p>Noted by:</p>
-                <div class="space-after-received"></div>
-                <p class="bold">LOIDA S. QUINTILLA</p>
-                <p>Unit Manager</p>
+
+            <h2 class="center">ACKNOWLEDGEMENT RECEIPT (CLIENT COPY)</h2>
+
+            <p>This is to acknowledge the payment from <span class="bold" id="receiptName">[Salutation] [Name]</span> the total amount of <span class="bold" id="receiptAmount">[Amount]</span> as payment for the following:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mode of Payment</th>
+                        <th>Amount</th>
+                        <th>Particular</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="tableModeOfPayment">[Mode of Payment]</td>
+                        <td id="tableReservationAmount">[Reservation Amount]</td>
+                        <td id="tableParticular">RESERVATION PAYMENT (HOLDING FEE) <span id="dynamicParticular">[Particular]</span></td>
+                        <td id="tableDate">[Date]</td>
+                    </tr>
+                    <!-- Optional Equity Row -->
+                    <tr id="equityRow" style="display: none;">
+                        <td id="equityModeOfPayment">[Mode of Payment]</td>
+                        <td id="equityAmount">[Equity Amount]</td>
+                        <td id="equityParticular">EQUITY</td>
+                        <td id="equityDate">[Date]</td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- Name/Agent section -->
+            <div class="name-agent" id="nameAgentDisplay">[Name]/[Agent]</div>
+            <!-- Signature section with Received by and Noted by side by side -->
+            <div class="signature">
+                <div>
+                    <p>Received by:</p>
+                    <div class="space-after-received"></div>
+                    <p class="bold">DEAN VICTOR L. MONTALVO</p>
+                    <p>Accounting In-charge</p>
+                </div>
+                <div>
+                    <p>Noted by:</p>
+                    <div class="space-after-received"></div>
+                    <p class="bold">LOIDA S. QUINTILLA</p>
+                    <p>Unit Manager</p>
+                </div>
+            </div>
+
+            <div class="footer">
+                <p class="center">This is a temporary receipt only. The reservation fee secures my intent to acquire a property and process a loan with Deca Homes Iloilo (8990 Housing).
+        I agree that once that I will backout it will result to a non-refundable processing fee: ₱1,000 for Economic Units or ₱500 for Socialized Units.</p>
             </div>
         </div>
 
-        <div class="footer">
-            <p class="center">This is a temporary receipt only. The reservation fee secures my intent to acquire a property and process a loan with Deca Homes Iloilo (8990 Housing).
-I agree that once that I will backout it will result to a non-refundable processing fee: ₱1,000 for Economic Units or ₱500 for Socialized Units.</p>
+        <!-- Cutting Line -->
+        <div class="cutting-line">
+        -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         </div>
+
+        <!-- Office Copy -->
+        <div class="receipt">
+            <div class="footer">
+                <p class="bold">QUINTILLA GROUP</p>
+                <p>Door 3 & 4 Iloilo New Life Commercial Building</p>
+                <p>Mabini Corner Texas St., Sampaguita Iloilo City 5000</p>
+                <p>Tel. No.: 500-2527</p>
+            </div>
+
+            <h2 class="center">ACKNOWLEDGEMENT RECEIPT (OFFICE COPY)</h2>
+
+            <p>This is to acknowledge the payment from <span class="bold" id="receiptName2">[Salutation] [Name]</span> the total amount of <span class="bold" id="receiptAmount2">[Amount]</span> as payment for the following:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mode of Payment</th>
+                        <th>Amount</th>
+                        <th>Particular</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="tableModeOfPayment2">[Mode of Payment]</td>
+                        <td id="tableReservationAmount2">[Reservation Amount]</td>
+                        <td id="tableParticular2">RESERVATION PAYMENT (HOLDING FEE) <span id="dynamicParticular2">[Particular]</span></td>
+                        <td id="tableDate2">[Date]</td>
+                    </tr>
+                    <!-- Optional Equity Row -->
+                    <tr id="equityRow2" style="display: none;">
+                        <td id="equityModeOfPayment2">[Mode of Payment]</td>
+                        <td id="equityAmount2">[Equity Amount]</td>
+                        <td id="equityParticular2">EQUITY</td>
+                        <td id="equityDate2">[Date]</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Display Agent's Name and Group -->
+            <div class="agent-name">
+                Agent: <span id="displayAgent">[Agent Name]</span> | Group: <span id="displayGroup">[Group]</span>
+            </div>
+
+            <!-- Name/Agent section -->
+            <div class="name-agent" id="nameAgentDisplay2">[Name]/[Agent]</div>
+            <!-- Signature section with Received by and Noted by side by side -->
+            <div class="signature">
+                <div>
+                    <p>Received by:</p>
+                    <div class="space-after-received"></div>
+                    <p class="bold">DEAN VICTOR L. MONTALVO</p>
+                    <p>Accounting In-charge</p>
+                </div>
+                <div>
+                    <p>Noted by:</p>
+                    <div class="space-after-received"></div>
+                    <p class="bold">LOIDA S. QUINTILLA</p>
+                    <p>Unit Manager</p>
+                </div>
+            </div>
+
+            <div class="footer">
+                <p class="center">This is a temporary receipt only. The reservation fee secures my intent to acquire a property and process a loan with Deca Homes Iloilo (8990 Housing).
+        I agree that once that I will backout it will result to a non-refundable processing fee: ₱1,000 for Economic Units or ₱500 for Socialized Units.</p>
+            </div>
+        </div>
+
+        <button class="print-button" onclick="window.print()">Print Receipts</button>
     </div>
 
     <script>
@@ -409,9 +414,8 @@ I agree that once that I will backout it will result to a non-refundable process
             const date = document.getElementById('date').value;
             const particular = document.getElementById('particular').value || "[Particular]";
             const modeOfPayment = document.getElementById('modeOfPayment').value || "[Mode of Payment]";
-            const agent = document.getElementById('agent').value || "[Agent Name]";
+            const agent = document.getElementById('agent').value || "[Agent]";
             const group = document.getElementById('group').value || "[Group]";
-            const paymentGivenBy = document.getElementById('paymentGivenBy').value || "BUYER";
 
             // Format the date
             const formattedDate = date ? new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase() : "[Date]";
@@ -449,8 +453,9 @@ I agree that once that I will backout it will result to a non-refundable process
             document.getElementById('displayAgent').textContent = agent;
             document.getElementById('displayGroup').textContent = group;
 
-            // Update Payment Given By
-            document.getElementById('displayPaymentGivenBy').textContent = paymentGivenBy;
+            // Update name/agent display
+            document.getElementById('nameAgentDisplay').textContent = `${name}/${agent}`;
+            document.getElementById('nameAgentDisplay2').textContent = `${name}/${agent}`;
 
             // Update Equity Row (if equity is provided)
             const equityRow = document.getElementById('equityRow');
