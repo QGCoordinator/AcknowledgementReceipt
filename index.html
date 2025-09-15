@@ -32,25 +32,27 @@
         }
         .receipt {
             width: 8.5in;
-            height: 5.5in;
-            padding: 0.25in;
+            min-height: 4.5in;
+            padding: 0.1in 0.25in 0.25in; /* Adjusted top padding */
             box-sizing: border-box;
-            border: 1px solid #000;
             background-color: #fff;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            margin-bottom: 20px;
+        }
+        .receipt.top-receipt {
+            border-bottom: 2px dashed #000;
+            margin-bottom: 0.75in; /* Adjusted margin for cutting space */
         }
         .receipt h2 {
             text-align: center;
-            margin: 0 0 0.1in 0;
+            margin: 0 0 0.1in 0; /* Removed top margin */
             font-size: 14px;
         }
         .receipt table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 0.05in;
+            margin-bottom: 0.1in;
             font-size: 10px;
         }
         .receipt table, .receipt th, .receipt td {
@@ -60,21 +62,14 @@
             padding: 0.1in;
             text-align: left;
         }
-        .receipt .signature {
-            display: flex;
-            justify-content: space-between;
-            font-size: 10px;
-        }
-        .receipt .signature div {
-            width: 45%;
-        }
         .receipt .footer {
             text-align: left;
             margin-top: 0.1in;
-            font-size: 9px;
+            font-size: 12px;
         }
         .receipt .footer p {
             margin: 0.05in 0;
+            line-height: 1.3;
         }
         .receipt .bold {
             font-weight: bold;
@@ -104,20 +99,17 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+        .remarks {
+            margin-top: 0.1in;
+            font-size: 12px;
+        }
         .agent-name {
             font-weight: bold;
-            margin-top: 0.05in;
+            margin-top: 0.1in;
             font-size: 10px;
-            margin-bottom: 0.05in;
         }
         .space-after-received {
-            margin-bottom: 0.2in;
-        }
-        .cutting-line {
-            text-align: center;
-            margin: 0.2in 0;
-            font-size: 12px;
-            font-weight: bold;
+            margin-bottom: 0.3in;
         }
         .add-item-container {
             display: flex;
@@ -142,10 +134,17 @@
         .add-item-container button:hover {
             background-color: #45a049;
         }
+        .client-signature {
+            margin-top: 0.1in;
+            font-size: 10px;
+            text-align: left;
+            margin-bottom: 0.1in;
+            width: 100%;
+        }
         .name-agent {
             font-weight: bold;
             font-size: 11px;
-            margin-bottom: 0.01in;
+            margin-bottom: 0.05in;
         }
         .print-button {
             padding: 12px 24px;
@@ -160,34 +159,67 @@
         .print-button:hover {
             background-color: #0069d9;
         }
+        .signature-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.2in;
+            font-size: 10px;
+            width: 100%;
+        }
+        .signature-labels div {
+            width: 30%;
+            text-align: center;
+        }
+        .signature-names {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.05in;
+            font-size: 10px;
+            width: 100%;
+        }
+        .signature-names div {
+            width: 30%;
+            text-align: center;
+        }
+        .error {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
         @media print {
-            body {
+            body, html {
+                width: 8.5in;
+                height: 11in;
                 margin: 0;
                 padding: 0;
                 background-color: white;
+            }
+            .container {
+                width: 8.5in;
+                max-width: 100%;
+                display: block;
             }
             .input-section, .print-button {
                 display: none;
             }
             .receipt {
                 width: 8.5in;
-                height: 5.5in;
-                padding: 0.25in;
+                height: 4.5in;
+                padding: 0.1in 0.25in 0.25in;
                 border: none;
-                page-break-after: always;
+                page-break-inside: avoid;
+                break-inside: avoid;
             }
-            .container {
-                max-width: 100%;
-            }
-            .cutting-line {
-                display: none;
+            .receipt.top-receipt {
+                border-bottom: 2px dashed #000;
+                margin-bottom: 0.75in;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Input Section -->
         <div class="input-section">
             <h2>Receipt Details</h2>
             <div class="input-grid">
@@ -201,22 +233,27 @@
                 <div class="input-group">
                     <label for="name">Name:</label>
                     <input type="text" id="name" placeholder="Enter Name" oninput="updateReceipt()">
+                    <div class="error" id="nameError">Please enter a name</div>
                 </div>
                 <div class="input-group">
                     <label for="reservationAmount">Reservation Amount:</label>
-                    <input type="text" id="reservationAmount" placeholder="Enter Reservation Amount" oninput="updateReceipt()">
+                    <input type="text" id="reservationAmount" placeholder="Enter Reservation Amount" oninput="validateNumber(this, 'reservationError'); updateReceipt()">
+                    <div class="error" id="reservationError">Please enter a valid number</div>
                 </div>
                 <div class="input-group">
                     <label for="equity">Equity (Optional):</label>
-                    <input type="text" id="equity" placeholder="Enter Equity Amount" oninput="updateReceipt()">
+                    <input type="text" id="equity" placeholder="Enter Equity Amount" oninput="validateNumber(this, 'equityError'); updateReceipt()">
+                    <div class="error" id="equityError">Please enter a valid number</div>
                 </div>
                 <div class="input-group">
                     <label for="date">Date:</label>
                     <input type="date" id="date" oninput="updateReceipt()">
+                    <div class="error" id="dateError">Please select a date</div>
                 </div>
                 <div class="input-group">
                     <label for="particular">Particular:</label>
                     <input type="text" id="particular" placeholder="Enter Particular (e.g., 1 REG UNIT – DHSS P2)" oninput="updateReceipt()">
+                    <div class="error" id="particularError">Please enter a particular</div>
                 </div>
                 <div class="input-group">
                     <label for="modeOfPayment">Mode of Payment:</label>
@@ -229,6 +266,7 @@
                 <div class="input-group">
                     <label for="agent">Agent:</label>
                     <input type="text" id="agent" placeholder="Enter Agent Name" oninput="updateReceipt()">
+                    <div class="error" id="agentError">Please enter an agent name</div>
                 </div>
                 <div class="input-group">
                     <label for="group">Group:</label>
@@ -258,6 +296,7 @@
                         <option value="UM OPEN GROUP - JDV GROUP">UM OPEN GROUP - JDV GROUP</option>
                         <option value="UM PERSONAL">UM PERSONAL</option>
                     </select>
+                    <div class="error" id="groupError">Please select or add a group</div>
                     <div class="add-item-container" id="addGroupContainer">
                         <input type="text" id="newGroup" placeholder="New group name">
                         <button onclick="addGroup()">Add Group</button>
@@ -266,8 +305,7 @@
             </div>
         </div>
 
-        <!-- Client Copy -->
-        <div class="receipt">
+        <div class="receipt top-receipt">
             <div class="footer">
                 <p class="bold">QUINTILLA GROUP</p>
                 <p>Door 3 & 4 Iloilo New Life Commercial Building</p>
@@ -295,7 +333,6 @@
                         <td id="tableParticular">RESERVATION PAYMENT (HOLDING FEE) <span id="dynamicParticular">[Particular]</span></td>
                         <td id="tableDate">[Date]</td>
                     </tr>
-                    <!-- Optional Equity Row -->
                     <tr id="equityRow" style="display: none;">
                         <td id="equityModeOfPayment">[Mode of Payment]</td>
                         <td id="equityAmount">[Equity Amount]</td>
@@ -304,36 +341,26 @@
                     </tr>
                 </tbody>
             </table>
-            <!-- Name/Agent section -->
-            <div class="name-agent" id="nameAgentDisplay">[Name]/[Agent]</div>
-            <!-- Signature section with Received by and Noted by side by side -->
-            <div class="signature">
-                <div>
-                    <p>Received by:</p>
-                    <div class="space-after-received"></div>
-                    <p class="bold">DEAN VICTOR L. MONTALVO</p>
-                    <p>Accounting In-charge</p>
-                </div>
-                <div>
-                    <p>Noted by:</p>
-                    <div class="space-after-received"></div>
-                    <p class="bold">LOIDA S. QUINTILLA</p>
-                    <p>Unit Manager</p>
-                </div>
-            </div>
 
+            <div class="signature-labels">
+                <div>Signed by:</div>
+                <div>Received by:</div>
+                <div>Noted by:</div>
+            </div>
+            
+            <div class="space-after-received"></div>
+            
+            <div class="signature-names">
+                <div id="signedByName">[Name]/[Agent]</div>
+                <div>DEAN VICTOR L. MONTALVO<br>Accounting In-charge</div>
+                <div>LOIDA S. QUINTILLA<br>Unit Manager</div>
+            </div>
+            
             <div class="footer">
                 <p class="center">This is a temporary receipt only. The reservation fee secures my intent to acquire a property and process a loan with Deca Homes Iloilo (8990 Housing).
-        I agree that once that I will backout it will result to a non-refundable processing fee: ₱1,000 for Economic Units or ₱500 for Socialized Units.</p>
+                I agree that once that I will backout it will result to a non-refundable processing fee: ₱1,000 for Economic Units or ₱500 for Socialized Units.</p>
             </div>
         </div>
-
-        <!-- Cutting Line -->
-        <div class="cutting-line">
-        -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-        </div>
-
-        <!-- Office Copy -->
         <div class="receipt">
             <div class="footer">
                 <p class="bold">QUINTILLA GROUP</p>
@@ -362,7 +389,6 @@
                         <td id="tableParticular2">RESERVATION PAYMENT (HOLDING FEE) <span id="dynamicParticular2">[Particular]</span></td>
                         <td id="tableDate2">[Date]</td>
                     </tr>
-                    <!-- Optional Equity Row -->
                     <tr id="equityRow2" style="display: none;">
                         <td id="equityModeOfPayment2">[Mode of Payment]</td>
                         <td id="equityAmount2">[Equity Amount]</td>
@@ -372,36 +398,31 @@
                 </tbody>
             </table>
 
-            <!-- Display Agent's Name and Group -->
             <div class="agent-name">
                 Agent: <span id="displayAgent">[Agent Name]</span> | Group: <span id="displayGroup">[Group]</span>
             </div>
 
-            <!-- Name/Agent section -->
-            <div class="name-agent" id="nameAgentDisplay2">[Name]/[Agent]</div>
-            <!-- Signature section with Received by and Noted by side by side -->
-            <div class="signature">
-                <div>
-                    <p>Received by:</p>
-                    <div class="space-after-received"></div>
-                    <p class="bold">DEAN VICTOR L. MONTALVO</p>
-                    <p>Accounting In-charge</p>
-                </div>
-                <div>
-                    <p>Noted by:</p>
-                    <div class="space-after-received"></div>
-                    <p class="bold">LOIDA S. QUINTILLA</p>
-                    <p>Unit Manager</p>
-                </div>
+            <div class="signature-labels">
+                <div>Signed by:</div>
+                <div>Received by:</div>
+                <div>Noted by:</div>
+            </div>
+            
+            <div class="space-after-received"></div>
+            
+            <div class="signature-names">
+                <div id="signedByName2">[Name]/[Agent]</div>
+                <div>DEAN VICTOR L. MONTALVO<br>Accounting In-charge</div>
+                <div>LOIDA S. QUINTILLA<br>Unit Manager</div>
             </div>
 
             <div class="footer">
                 <p class="center">This is a temporary receipt only. The reservation fee secures my intent to acquire a property and process a loan with Deca Homes Iloilo (8990 Housing).
-        I agree that once that I will backout it will result to a non-refundable processing fee: ₱1,000 for Economic Units or ₱500 for Socialized Units.</p>
+                I agree that once that I will backout it will result to a non-refundable processing fee: ₱1,000 for Economic Units or ₱500 for Socialized Units.</p>
             </div>
         </div>
 
-        <button class="print-button" onclick="window.print()">Print Receipts</button>
+        <button class="print-button" onclick="validateAndPrint()">Print Receipts</button>
     </div>
 
     <script>
@@ -421,8 +442,8 @@
             const formattedDate = date ? new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase() : "[Date]";
 
             // Convert amounts to numbers
-            const reservationAmountNum = parseFloat(reservationAmount) || 0;
-            const equityNum = parseFloat(equity) || 0;
+            const reservationAmountNum = parseFloat(reservationAmount.replace(/,/g, '')) || 0;
+            const equityNum = parseFloat(equity.replace(/,/g, '')) || 0;
 
             // Calculate total amount
             const totalAmount = reservationAmountNum + equityNum;
@@ -452,10 +473,10 @@
             // Update the Agent's name and Group
             document.getElementById('displayAgent').textContent = agent;
             document.getElementById('displayGroup').textContent = group;
-
-            // Update name/agent display
-            document.getElementById('nameAgentDisplay').textContent = `${name}/${agent}`;
-            document.getElementById('nameAgentDisplay2').textContent = `${name}/${agent}`;
+            
+            // Update signed by section
+            document.getElementById('signedByName').textContent = `${name}/${agent}`;
+            document.getElementById('signedByName2').textContent = `${name}/${agent}`;
 
             // Update Equity Row (if equity is provided)
             const equityRow = document.getElementById('equityRow');
@@ -497,6 +518,122 @@
                 updateReceipt();
                 // Clear the input field
                 newGroupInput.value = '';
+            }
+        }
+
+        function validateNumber(input, errorId) {
+            const errorElement = document.getElementById(errorId);
+            const value = input.value.replace(/,/g, '');
+            
+            if (value && isNaN(value)) {
+                errorElement.style.display = 'block';
+                input.style.borderColor = 'red';
+                return false;
+            } else {
+                errorElement.style.display = 'none';
+                input.style.borderColor = '#ccc';
+                
+                // Format with commas if it's a valid number
+                if (value && !isNaN(value)) {
+                    input.value = Number(value).toLocaleString();
+                }
+                return true;
+            }
+        }
+
+        function validateAndPrint() {
+            let isValid = true;
+            
+            // Validate name
+            const name = document.getElementById('name');
+            const nameError = document.getElementById('nameError');
+            if (!name.value.trim()) {
+                nameError.style.display = 'block';
+                name.style.borderColor = 'red';
+                isValid = false;
+            } else {
+                nameError.style.display = 'none';
+                name.style.borderColor = '#ccc';
+            }
+            
+            // Validate reservation amount
+            const reservationAmount = document.getElementById('reservationAmount');
+            const reservationError = document.getElementById('reservationError');
+            const reservationValue = reservationAmount.value.replace(/,/g, '');
+            if (!reservationValue || isNaN(reservationValue) || parseFloat(reservationValue) <= 0) {
+                reservationError.style.display = 'block';
+                reservationAmount.style.borderColor = 'red';
+                isValid = false;
+            } else {
+                reservationError.style.display = 'none';
+                reservationAmount.style.borderColor = '#ccc';
+            }
+            
+            // Validate date
+            const date = document.getElementById('date');
+            const dateError = document.getElementById('dateError');
+            if (!date.value) {
+                dateError.style.display = 'block';
+                date.style.borderColor = 'red';
+                isValid = false;
+            } else {
+                dateError.style.display = 'none';
+                date.style.borderColor = '#ccc';
+            }
+            
+            // Validate particular
+            const particular = document.getElementById('particular');
+            const particularError = document.getElementById('particularError');
+            if (!particular.value.trim()) {
+                particularError.style.display = 'block';
+                particular.style.borderColor = 'red';
+                isValid = false;
+            } else {
+                particularError.style.display = 'none';
+                particular.style.borderColor = '#ccc';
+            }
+            
+            // Validate agent
+            const agent = document.getElementById('agent');
+            const agentError = document.getElementById('agentError');
+            if (!agent.value.trim()) {
+                agentError.style.display = 'block';
+                agent.style.borderColor = 'red';
+                isValid = false;
+            } else {
+                agentError.style.display = 'none';
+                agent.style.borderColor = '#ccc';
+            }
+            
+            // Validate group
+            const group = document.getElementById('group');
+            const groupError = document.getElementById('groupError');
+            if (!group.value) {
+                groupError.style.display = 'block';
+                group.style.borderColor = 'red';
+                isValid = false;
+            } else {
+                groupError.style.display = 'none';
+                group.style.borderColor = '#ccc';
+            }
+            
+            // Validate equity if provided
+            const equity = document.getElementById('equity');
+            const equityError = document.getElementById('equityError');
+            const equityValue = equity.value.replace(/,/g, '');
+            if (equityValue && (isNaN(equityValue) || parseFloat(equityValue) < 0)) {
+                equityError.style.display = 'block';
+                equity.style.borderColor = 'red';
+                isValid = false;
+            } else {
+                equityError.style.display = 'none';
+                equity.style.borderColor = '#ccc';
+            }
+            
+            if (isValid) {
+                window.print();
+            } else {
+                alert('Please fix the errors before printing.');
             }
         }
 
