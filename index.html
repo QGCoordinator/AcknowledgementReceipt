@@ -18,7 +18,7 @@
         }
         .container {
             width: 100%;
-            max-width: 900px;
+            max-width: 8.5in;
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -30,10 +30,16 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             margin-bottom: 20px;
         }
+        .receipts-container {
+            position: relative;
+            width: 8.5in;
+            height: 11in; /* Total height for two receipts */
+            page-break-inside: avoid;
+        }
         .receipt {
             width: 8.5in;
-            min-height: 4.5in;
-            padding: 0.1in 0.25in 0.25in; /* Adjusted top padding */
+            height: 5.5in; /* Each receipt is 5.5 inches tall */
+            padding: 0.2in;
             box-sizing: border-box;
             background-color: #fff;
             display: flex;
@@ -42,11 +48,10 @@
         }
         .receipt.top-receipt {
             border-bottom: 2px dashed #000;
-            margin-bottom: 0.75in; /* Adjusted margin for cutting space */
         }
         .receipt h2 {
             text-align: center;
-            margin: 0 0 0.1in 0; /* Removed top margin */
+            margin: 0 0 0.1in 0;
             font-size: 14px;
         }
         .receipt table {
@@ -190,7 +195,6 @@
         @media print {
             body, html {
                 width: 8.5in;
-                height: 11in;
                 margin: 0;
                 padding: 0;
                 background-color: white;
@@ -203,17 +207,19 @@
             .input-section, .print-button {
                 display: none;
             }
+            .receipts-container {
+                height: 11in;
+                page-break-after: always;
+            }
             .receipt {
                 width: 8.5in;
-                height: 4.5in;
-                padding: 0.1in 0.25in 0.25in;
+                height: 5.5in;
+                padding: 0.2in;
                 border: none;
                 page-break-inside: avoid;
-                break-inside: avoid;
             }
             .receipt.top-receipt {
                 border-bottom: 2px dashed #000;
-                margin-bottom: 0.75in;
             }
         }
     </style>
@@ -305,120 +311,122 @@
             </div>
         </div>
 
-        <div class="receipt top-receipt">
-            <div class="footer">
-                <p class="bold">QUINTILLA GROUP</p>
-                <p>Door 3 & 4 Iloilo New Life Commercial Building</p>
-                <p>Mabini Corner Texas St., Sampaguita Iloilo City 5000</p>
-                <p>Tel. No.: 500-2527</p>
+        <div class="receipts-container">
+            <div class="receipt top-receipt">
+                <div class="footer">
+                    <p class="bold">QUINTILLA GROUP</p>
+                    <p>Door 3 & 4 Iloilo New Life Commercial Building</p>
+                    <p>Mabini Corner Texas St., Sampaguita Iloilo City 5000</p>
+                    <p>Tel. No.: 500-2527</p>
+                </div>
+
+                <h2 class="center">ACKNOWLEDGEMENT RECEIPT (CLIENT COPY)</h2>
+
+                <p>This is to acknowledge the payment from <span class="bold" id="receiptName">[Salutation] [Name]</span> the total amount of <span class="bold" id="receiptAmount">[Amount]</span> as payment for the following:</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mode of Payment</th>
+                            <th>Amount</th>
+                            <th>Particular</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="tableModeOfPayment">[Mode of Payment]</td>
+                            <td id="tableReservationAmount">[Reservation Amount]</td>
+                            <td id="tableParticular">RESERVATION PAYMENT (HOLDING FEE) <span id="dynamicParticular">[Particular]</span></td>
+                            <td id="tableDate">[Date]</td>
+                        </tr>
+                        <tr id="equityRow" style="display: none;">
+                            <td id="equityModeOfPayment">[Mode of Payment]</td>
+                            <td id="equityAmount">[Equity Amount]</td>
+                            <td id="equityParticular">EQUITY</td>
+                            <td id="equityDate">[Date]</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="signature-labels">
+                    <div>Signed by:</div>
+                    <div>Received by:</div>
+                    <div>Noted by:</div>
+                </div>
+                
+                <div class="space-after-received"></div>
+                
+                <div class="signature-names">
+                    <div id="signedByName">[Name]/[Agent]</div>
+                    <div>DEAN VICTOR L. MONTALVO<br>Accounting In-charge</div>
+                    <div>LOIDA S. QUINTILLA<br>Unit Manager</div>
+                </div>
+                
+                <div class="footer">
+                    <p class="center">This is a temporary receipt only. The reservation fee secures my intent to acquire a property and process a loan with Deca Homes Iloilo (8990 Housing).
+                    I agree that once that I will backout it will result to a non-refundable processing fee: ₱1,000 for Economic Units or ₱500 for Socialized Units.</p>
+                </div>
             </div>
+            <div class="receipt">
+                <div class="footer">
+                    <p class="bold">QUINTILLA GROUP</p>
+                    <p>Door 3 & 4 Iloilo New Life Commercial Building</p>
+                    <p>Mabini Corner Texas St., Sampaguita Iloilo City 5000</p>
+                    <p>Tel. No.: 500-2527</p>
+                </div>
 
-            <h2 class="center">ACKNOWLEDGEMENT RECEIPT (CLIENT COPY)</h2>
+                <h2 class="center">ACKNOWLEDGEMENT RECEIPT (OFFICE COPY)</h2>
 
-            <p>This is to acknowledge the payment from <span class="bold" id="receiptName">[Salutation] [Name]</span> the total amount of <span class="bold" id="receiptAmount">[Amount]</span> as payment for the following:</p>
+                <p>This is to acknowledge the payment from <span class="bold" id="receiptName2">[Salutation] [Name]</span> the total amount of <span class="bold" id="receiptAmount2">[Amount]</span> as payment for the following:</p>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Mode of Payment</th>
-                        <th>Amount</th>
-                        <th>Particular</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td id="tableModeOfPayment">[Mode of Payment]</td>
-                        <td id="tableReservationAmount">[Reservation Amount]</td>
-                        <td id="tableParticular">RESERVATION PAYMENT (HOLDING FEE) <span id="dynamicParticular">[Particular]</span></td>
-                        <td id="tableDate">[Date]</td>
-                    </tr>
-                    <tr id="equityRow" style="display: none;">
-                        <td id="equityModeOfPayment">[Mode of Payment]</td>
-                        <td id="equityAmount">[Equity Amount]</td>
-                        <td id="equityParticular">EQUITY</td>
-                        <td id="equityDate">[Date]</td>
-                    </tr>
-                </tbody>
-            </table>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mode of Payment</th>
+                            <th>Amount</th>
+                            <th>Particular</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="tableModeOfPayment2">[Mode of Payment]</td>
+                            <td id="tableReservationAmount2">[Reservation Amount]</td>
+                            <td id="tableParticular2">RESERVATION PAYMENT (HOLDING FEE) <span id="dynamicParticular2">[Particular]</span></td>
+                            <td id="tableDate2">[Date]</td>
+                        </tr>
+                        <tr id="equityRow2" style="display: none;">
+                            <td id="equityModeOfPayment2">[Mode of Payment]</td>
+                            <td id="equityAmount2">[Equity Amount]</td>
+                            <td id="equityParticular2">EQUITY</td>
+                            <td id="equityDate2">[Date]</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-            <div class="signature-labels">
-                <div>Signed by:</div>
-                <div>Received by:</div>
-                <div>Noted by:</div>
-            </div>
-            
-            <div class="space-after-received"></div>
-            
-            <div class="signature-names">
-                <div id="signedByName">[Name]/[Agent]</div>
-                <div>DEAN VICTOR L. MONTALVO<br>Accounting In-charge</div>
-                <div>LOIDA S. QUINTILLA<br>Unit Manager</div>
-            </div>
-            
-            <div class="footer">
-                <p class="center">This is a temporary receipt only. The reservation fee secures my intent to acquire a property and process a loan with Deca Homes Iloilo (8990 Housing).
-                I agree that once that I will backout it will result to a non-refundable processing fee: ₱1,000 for Economic Units or ₱500 for Socialized Units.</p>
-            </div>
-        </div>
-        <div class="receipt">
-            <div class="footer">
-                <p class="bold">QUINTILLA GROUP</p>
-                <p>Door 3 & 4 Iloilo New Life Commercial Building</p>
-                <p>Mabini Corner Texas St., Sampaguita Iloilo City 5000</p>
-                <p>Tel. No.: 500-2527</p>
-            </div>
+                <div class="agent-name">
+                    Agent: <span id="displayAgent">[Agent Name]</span> | Group: <span id="displayGroup">[Group]</span>
+                </div>
 
-            <h2 class="center">ACKNOWLEDGEMENT RECEIPT (OFFICE COPY)</h2>
+                <div class="signature-labels">
+                    <div>Signed by:</div>
+                    <div>Received by:</div>
+                    <div>Noted by:</div>
+                </div>
+                
+                <div class="space-after-received"></div>
+                
+                <div class="signature-names">
+                    <div id="signedByName2">[Name]/[Agent]</div>
+                    <div>DEAN VICTOR L. MONTALVO<br>Accounting In-charge</div>
+                    <div>LOIDA S. QUINTILLA<br>Unit Manager</div>
+                </div>
 
-            <p>This is to acknowledge the payment from <span class="bold" id="receiptName2">[Salutation] [Name]</span> the total amount of <span class="bold" id="receiptAmount2">[Amount]</span> as payment for the following:</p>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Mode of Payment</th>
-                        <th>Amount</th>
-                        <th>Particular</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td id="tableModeOfPayment2">[Mode of Payment]</td>
-                        <td id="tableReservationAmount2">[Reservation Amount]</td>
-                        <td id="tableParticular2">RESERVATION PAYMENT (HOLDING FEE) <span id="dynamicParticular2">[Particular]</span></td>
-                        <td id="tableDate2">[Date]</td>
-                    </tr>
-                    <tr id="equityRow2" style="display: none;">
-                        <td id="equityModeOfPayment2">[Mode of Payment]</td>
-                        <td id="equityAmount2">[Equity Amount]</td>
-                        <td id="equityParticular2">EQUITY</td>
-                        <td id="equityDate2">[Date]</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="agent-name">
-                Agent: <span id="displayAgent">[Agent Name]</span> | Group: <span id="displayGroup">[Group]</span>
-            </div>
-
-            <div class="signature-labels">
-                <div>Signed by:</div>
-                <div>Received by:</div>
-                <div>Noted by:</div>
-            </div>
-            
-            <div class="space-after-received"></div>
-            
-            <div class="signature-names">
-                <div id="signedByName2">[Name]/[Agent]</div>
-                <div>DEAN VICTOR L. MONTALVO<br>Accounting In-charge</div>
-                <div>LOIDA S. QUINTILLA<br>Unit Manager</div>
-            </div>
-
-            <div class="footer">
-                <p class="center">This is a temporary receipt only. The reservation fee secures my intent to acquire a property and process a loan with Deca Homes Iloilo (8990 Housing).
-                I agree that once that I will backout it will result to a non-refundable processing fee: ₱1,000 for Economic Units or ₱500 for Socialized Units.</p>
+                <div class="footer">
+                    <p class="center">This is a temporary receipt only. The reservation fee secures my intent to acquire a property and process a loan with Deca Homes Iloilo (8990 Housing).
+                    I agree that once that I will backout it will result to a non-refundable processing fee: ₱1,000 for Economic Units or ₱500 for Socialized Units.</p>
+                </div>
             </div>
         </div>
 
