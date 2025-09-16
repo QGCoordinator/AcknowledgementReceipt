@@ -192,6 +192,15 @@
             margin-top: 5px;
             display: none;
         }
+        .same-as-reservation {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+        .same-as-reservation input {
+            margin-right: 5px;
+        }
         @media print {
             body, html {
                 width: 8.5in;
@@ -248,7 +257,7 @@
                 </div>
                 <div class="input-group">
                     <label for="equity">Equity (Optional):</label>
-                    <input type="text" id="equity" placeholder="Enter Equity Amount" oninput="validateNumber(this, 'equityError'); updateReceipt()">
+                    <input type="text" id="equity" placeholder="Enter Equity Amount" oninput="validateNumber(this, 'equityError'); updateReceipt()" value="175,774">
                     <div class="error" id="equityError">Please enter a valid number</div>
                 </div>
                 <div class="input-group">
@@ -262,12 +271,24 @@
                     <div class="error" id="particularError">Please enter a particular</div>
                 </div>
                 <div class="input-group">
-                    <label for="modeOfPayment">Mode of Payment:</label>
+                    <label for="modeOfPayment">Reservation Mode of Payment:</label>
                     <select id="modeOfPayment" oninput="updateReceipt()">
                         <option value="CASH">CASH</option>
                         <option value="CHEQUE">CHEQUE</option>
                         <option value="BANK TRANSFER">BANK TRANSFER</option>
                     </select>
+                </div>
+                <div class="input-group">
+                    <label for="equityModeOfPayment">Equity Mode of Payment:</label>
+                    <select id="equityModeOfPayment" oninput="updateReceipt()">
+                        <option value="CASH">CASH</option>
+                        <option value="CHEQUE">CHEQUE</option>
+                        <option value="BANK TRANSFER">BANK TRANSFER</option>
+                    </select>
+                    <div class="same-as-reservation">
+                        <input type="checkbox" id="sameAsReservation" checked onchange="syncPaymentModes()">
+                        <label for="sameAsReservation">Same as Reservation</label>
+                    </div>
                 </div>
                 <div class="input-group">
                     <label for="agent">Agent:</label>
@@ -293,7 +314,7 @@
                         <option value="UM OPEN GROUP - JAVA">UM OPEN GROUP - JAVA</option>
                         <option value="UM OPEN GROUP - IREB">UM OPEN GROUP - IREB</option>
                         <option value="UM OPEN GROUP - A+">UM OPEN GROUP - A+</option>
-                        <option value="UM OPEN GROUP - DORONILA">UM OPEN GROUP - DORONILA</option>
+                        <option value="UM OPEN GROUP - DORONILA">UM OPEN GROUP - DORONILa</option>
                         <option value="UM OPEN GROUP - BODIOLA">UM OPEN GROUP - BODIOLA</option>
                         <option value="UM OPEN GROUP - ONE ZION">UM OPEN GROUP - ONE ZION</option>
                         <option value="UM OPEN GROUP - GOLDKEY">UM OPEN GROUP - GOLDKEY</option>
@@ -443,6 +464,7 @@
             const date = document.getElementById('date').value;
             const particular = document.getElementById('particular').value || "[Particular]";
             const modeOfPayment = document.getElementById('modeOfPayment').value || "[Mode of Payment]";
+            const equityModeOfPayment = document.getElementById('equityModeOfPayment').value || "[Mode of Payment]";
             const agent = document.getElementById('agent').value || "[Agent]";
             const group = document.getElementById('group').value || "[Group]";
 
@@ -492,16 +514,31 @@
             if (equityNum > 0) {
                 equityRow.style.display = "table-row";
                 equityRow2.style.display = "table-row";
-                document.getElementById('equityModeOfPayment').textContent = modeOfPayment;
+                document.getElementById('equityModeOfPayment').textContent = equityModeOfPayment;
                 document.getElementById('equityAmount').textContent = formattedEquity;
                 document.getElementById('equityDate').textContent = formattedDate;
-                document.getElementById('equityModeOfPayment2').textContent = modeOfPayment;
+                document.getElementById('equityModeOfPayment2').textContent = equityModeOfPayment;
                 document.getElementById('equityAmount2').textContent = formattedEquity;
                 document.getElementById('equityDate2').textContent = formattedDate;
             } else {
                 equityRow.style.display = "none";
                 equityRow2.style.display = "none";
             }
+        }
+
+        function syncPaymentModes() {
+            const sameAsReservation = document.getElementById('sameAsReservation');
+            const equityModeOfPayment = document.getElementById('equityModeOfPayment');
+            const modeOfPayment = document.getElementById('modeOfPayment');
+            
+            if (sameAsReservation.checked) {
+                equityModeOfPayment.value = modeOfPayment.value;
+                equityModeOfPayment.disabled = true;
+            } else {
+                equityModeOfPayment.disabled = false;
+            }
+            
+            updateReceipt();
         }
 
         function addGroup() {
@@ -646,7 +683,18 @@
         }
 
         // Initialize with empty receipt
-        updateReceipt();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set today's date as default
+            const today = new Date();
+            const formattedDate = today.toISOString().substr(0, 10);
+            document.getElementById('date').value = formattedDate;
+            
+            // Initialize the equity mode of payment
+            syncPaymentModes();
+            
+            // Update receipt
+            updateReceipt();
+        });
     </script>
 </body>
 </html>
