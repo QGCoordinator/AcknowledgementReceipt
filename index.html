@@ -160,6 +160,7 @@
             cursor: pointer;
             font-size: 16px;
             margin-top: 20px;
+            margin-bottom: 20px;
         }
         .print-button:hover {
             background-color: #0069d9;
@@ -192,14 +193,14 @@
             margin-top: 5px;
             display: none;
         }
-        .same-as-reservation {
+        .payment-type-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .payment-type-option {
             display: flex;
             align-items: center;
-            margin-top: 5px;
-            font-size: 12px;
-        }
-        .same-as-reservation input {
-            margin-right: 5px;
         }
         @media print {
             body, html {
@@ -237,6 +238,22 @@
     <div class="container">
         <div class="input-section">
             <h2>Receipt Details</h2>
+            
+            <div class="payment-type-container">
+                <div class="payment-type-option">
+                    <input type="radio" id="reservationOnly" name="paymentType" value="reservation" checked onchange="togglePaymentType()">
+                    <label for="reservationOnly">Reservation Only</label>
+                </div>
+                <div class="payment-type-option">
+                    <input type="radio" id="equityOnly" name="paymentType" value="equity" onchange="togglePaymentType()">
+                    <label for="equityOnly">Equity Only</label>
+                </div>
+                <div class="payment-type-option">
+                    <input type="radio" id="bothPayments" name="paymentType" value="both" onchange="togglePaymentType()">
+                    <label for="bothPayments">Both Payments</label>
+                </div>
+            </div>
+            
             <div class="input-grid">
                 <div class="input-group">
                     <label for="salutation">Salutation:</label>
@@ -250,14 +267,14 @@
                     <input type="text" id="name" placeholder="Enter Name" oninput="updateReceipt()">
                     <div class="error" id="nameError">Please enter a name</div>
                 </div>
-                <div class="input-group">
+                <div class="input-group" id="reservationAmountGroup">
                     <label for="reservationAmount">Reservation Amount:</label>
                     <input type="text" id="reservationAmount" placeholder="Enter Reservation Amount" oninput="validateNumber(this, 'reservationError'); updateReceipt()">
                     <div class="error" id="reservationError">Please enter a valid number</div>
                 </div>
-                <div class="input-group">
-                    <label for="equity">Equity (Optional):</label>
-                    <input type="text" id="equity" placeholder="Enter Equity Amount" oninput="validateNumber(this, 'equityError'); updateReceipt()" value="175,774">
+                <div class="input-group" id="equityAmountGroup">
+                    <label for="equity">Equity Amount:</label>
+                    <input type="text" id="equity" placeholder="Enter Equity Amount" oninput="validateNumber(this, 'equityError'); updateReceipt()">
                     <div class="error" id="equityError">Please enter a valid number</div>
                 </div>
                 <div class="input-group">
@@ -270,7 +287,7 @@
                     <input type="text" id="particular" placeholder="Enter Particular (e.g., 1 REG UNIT – DHSS P2)" oninput="updateReceipt()">
                     <div class="error" id="particularError">Please enter a particular</div>
                 </div>
-                <div class="input-group">
+                <div class="input-group" id="reservationModeGroup">
                     <label for="modeOfPayment">Reservation Mode of Payment:</label>
                     <select id="modeOfPayment" oninput="updateReceipt()">
                         <option value="CASH">CASH</option>
@@ -278,17 +295,13 @@
                         <option value="BANK TRANSFER">BANK TRANSFER</option>
                     </select>
                 </div>
-                <div class="input-group">
+                <div class="input-group" id="equityModeGroup">
                     <label for="equityModeOfPayment">Equity Mode of Payment:</label>
                     <select id="equityModeOfPayment" oninput="updateReceipt()">
                         <option value="CASH">CASH</option>
                         <option value="CHEQUE">CHEQUE</option>
                         <option value="BANK TRANSFER">BANK TRANSFER</option>
                     </select>
-                    <div class="same-as-reservation">
-                        <input type="checkbox" id="sameAsReservation" checked onchange="syncPaymentModes()">
-                        <label for="sameAsReservation">Same as Reservation</label>
-                    </div>
                 </div>
                 <div class="input-group">
                     <label for="agent">Agent:</label>
@@ -314,7 +327,7 @@
                         <option value="UM OPEN GROUP - JAVA">UM OPEN GROUP - JAVA</option>
                         <option value="UM OPEN GROUP - IREB">UM OPEN GROUP - IREB</option>
                         <option value="UM OPEN GROUP - A+">UM OPEN GROUP - A+</option>
-                        <option value="UM OPEN GROUP - DORONILA">UM OPEN GROUP - DORONILa</option>
+                        <option value="UM OPEN GROUP - DORONILA">UM OPEN GROUP - DORONILA</option>
                         <option value="UM OPEN GROUP - BODIOLA">UM OPEN GROUP - BODIOLA</option>
                         <option value="UM OPEN GROUP - ONE ZION">UM OPEN GROUP - ONE ZION</option>
                         <option value="UM OPEN GROUP - GOLDKEY">UM OPEN GROUP - GOLDKEY</option>
@@ -355,17 +368,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr id="reservationRow">
                             <td id="tableModeOfPayment">[Mode of Payment]</td>
                             <td id="tableReservationAmount">[Reservation Amount]</td>
-                            <td id="tableParticular">RESERVATION PAYMENT (HOLDING FEE) <span id="dynamicParticular">[Particular]</span></td>
+                            <td id="tableParticular">RESERVATION PAYMENT <span id="dynamicParticular">[Particular]</span></td>
                             <td id="tableDate">[Date]</td>
                         </tr>
                         <tr id="equityRow" style="display: none;">
-                            <td id="equityModeOfPayment">[Mode of Payment]</td>
-                            <td id="equityAmount">[Equity Amount]</td>
-                            <td id="equityParticular">EQUITY</td>
-                            <td id="equityDate">[Date]</td>
+                            <td id="tableEquityModeOfPayment">[Mode of Payment]</td>
+                            <td id="tableEquityAmount">[Equity Amount]</td>
+                            <td id="tableEquityParticular">EQUITY</td>
+                            <td id="tableEquityDate">[Date]</td>
                         </tr>
                     </tbody>
                 </table>
@@ -411,17 +424,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr id="reservationRow2">
                             <td id="tableModeOfPayment2">[Mode of Payment]</td>
                             <td id="tableReservationAmount2">[Reservation Amount]</td>
-                            <td id="tableParticular2">RESERVATION PAYMENT (HOLDING FEE) <span id="dynamicParticular2">[Particular]</span></td>
+                            <td id="tableParticular2">RESERVATION PAYMENT <span id="dynamicParticular2">[Particular]</span></td>
                             <td id="tableDate2">[Date]</td>
                         </tr>
                         <tr id="equityRow2" style="display: none;">
-                            <td id="equityModeOfPayment2">[Mode of Payment]</td>
-                            <td id="equityAmount2">[Equity Amount]</td>
-                            <td id="equityParticular2">EQUITY</td>
-                            <td id="equityDate2">[Date]</td>
+                            <td id="tableEquityModeOfPayment2">[Mode of Payment]</td>
+                            <td id="tableEquityAmount2">[Equity Amount]</td>
+                            <td id="tableEquityParticular2">EQUITY</td>
+                            <td id="tableEquityDate2">[Date]</td>
                         </tr>
                     </tbody>
                 </table>
@@ -455,6 +468,60 @@
     </div>
 
     <script>
+        function togglePaymentType() {
+            const paymentType = document.querySelector('input[name="paymentType"]:checked').value;
+            const reservationAmountGroup = document.getElementById('reservationAmountGroup');
+            const equityAmountGroup = document.getElementById('equityAmountGroup');
+            const reservationModeGroup = document.getElementById('reservationModeGroup');
+            const equityModeGroup = document.getElementById('equityModeGroup');
+            const reservationRow = document.getElementById('reservationRow');
+            const reservationRow2 = document.getElementById('reservationRow2');
+            const equityRow = document.getElementById('equityRow');
+            const equityRow2 = document.getElementById('equityRow2');
+            
+            if (paymentType === 'reservation') {
+                // Show only reservation fields
+                reservationAmountGroup.style.display = 'flex';
+                equityAmountGroup.style.display = 'none';
+                reservationModeGroup.style.display = 'flex';
+                equityModeGroup.style.display = 'none';
+                
+                // Show only reservation row in receipt
+                reservationRow.style.display = 'table-row';
+                reservationRow2.style.display = 'table-row';
+                equityRow.style.display = 'none';
+                equityRow2.style.display = 'none';
+                
+            } else if (paymentType === 'equity') {
+                // Show only equity fields
+                reservationAmountGroup.style.display = 'none';
+                equityAmountGroup.style.display = 'flex';
+                reservationModeGroup.style.display = 'none';
+                equityModeGroup.style.display = 'flex';
+                
+                // Show only equity row in receipt
+                reservationRow.style.display = 'none';
+                reservationRow2.style.display = 'none';
+                equityRow.style.display = 'table-row';
+                equityRow2.style.display = 'table-row';
+                
+            } else if (paymentType === 'both') {
+                // Show both fields
+                reservationAmountGroup.style.display = 'flex';
+                equityAmountGroup.style.display = 'flex';
+                reservationModeGroup.style.display = 'flex';
+                equityModeGroup.style.display = 'flex';
+                
+                // Show both rows in receipt
+                reservationRow.style.display = 'table-row';
+                reservationRow2.style.display = 'table-row';
+                equityRow.style.display = 'table-row';
+                equityRow2.style.display = 'table-row';
+            }
+            
+            updateReceipt();
+        }
+
         function updateReceipt() {
             // Get input values
             const salutation = document.getElementById('salutation').value;
@@ -467,6 +534,7 @@
             const equityModeOfPayment = document.getElementById('equityModeOfPayment').value || "[Mode of Payment]";
             const agent = document.getElementById('agent').value || "[Agent]";
             const group = document.getElementById('group').value || "[Group]";
+            const paymentType = document.querySelector('input[name="paymentType"]:checked').value;
 
             // Format the date
             const formattedDate = date ? new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase() : "[Date]";
@@ -475,12 +543,19 @@
             const reservationAmountNum = parseFloat(reservationAmount.replace(/,/g, '')) || 0;
             const equityNum = parseFloat(equity.replace(/,/g, '')) || 0;
 
-            // Calculate total amount
-            const totalAmount = reservationAmountNum + equityNum;
+            // Calculate total amount based on selected payment type
+            let totalAmount = 0;
+            if (paymentType === 'reservation') {
+                totalAmount = reservationAmountNum;
+            } else if (paymentType === 'equity') {
+                totalAmount = equityNum;
+            } else if (paymentType === 'both') {
+                totalAmount = reservationAmountNum + equityNum;
+            }
 
             // Add Philippine Peso sign (₱) to the amounts
             const formattedReservationAmount = reservationAmountNum ? `₱ ${reservationAmountNum.toLocaleString()}` : "[Reservation Amount]";
-            const formattedEquity = equityNum ? `₱ ${equityNum.toLocaleString()}` : "";
+            const formattedEquity = equityNum ? `₱ ${equityNum.toLocaleString()}` : "[Equity Amount]";
             const formattedTotalAmount = totalAmount ? `₱ ${totalAmount.toLocaleString()}` : "[Amount]";
 
             // Update the receipt content
@@ -508,37 +583,33 @@
             document.getElementById('signedByName').textContent = `${name}/${agent}`;
             document.getElementById('signedByName2').textContent = `${name}/${agent}`;
 
-            // Update Equity Row (if equity is provided)
+            // Update Equity Row
             const equityRow = document.getElementById('equityRow');
             const equityRow2 = document.getElementById('equityRow2');
-            if (equityNum > 0) {
+            const reservationRow = document.getElementById('reservationRow');
+            const reservationRow2 = document.getElementById('reservationRow2');
+            
+            if (paymentType === 'equity' || paymentType === 'both') {
                 equityRow.style.display = "table-row";
                 equityRow2.style.display = "table-row";
-                document.getElementById('equityModeOfPayment').textContent = equityModeOfPayment;
-                document.getElementById('equityAmount').textContent = formattedEquity;
-                document.getElementById('equityDate').textContent = formattedDate;
-                document.getElementById('equityModeOfPayment2').textContent = equityModeOfPayment;
-                document.getElementById('equityAmount2').textContent = formattedEquity;
-                document.getElementById('equityDate2').textContent = formattedDate;
+                document.getElementById('tableEquityModeOfPayment').textContent = equityModeOfPayment;
+                document.getElementById('tableEquityAmount').textContent = formattedEquity;
+                document.getElementById('tableEquityDate').textContent = formattedDate;
+                document.getElementById('tableEquityModeOfPayment2').textContent = equityModeOfPayment;
+                document.getElementById('tableEquityAmount2').textContent = formattedEquity;
+                document.getElementById('tableEquityDate2').textContent = formattedDate;
             } else {
                 equityRow.style.display = "none";
                 equityRow2.style.display = "none";
             }
-        }
-
-        function syncPaymentModes() {
-            const sameAsReservation = document.getElementById('sameAsReservation');
-            const equityModeOfPayment = document.getElementById('equityModeOfPayment');
-            const modeOfPayment = document.getElementById('modeOfPayment');
             
-            if (sameAsReservation.checked) {
-                equityModeOfPayment.value = modeOfPayment.value;
-                equityModeOfPayment.disabled = true;
+            if (paymentType === 'reservation' || paymentType === 'both') {
+                reservationRow.style.display = "table-row";
+                reservationRow2.style.display = "table-row";
             } else {
-                equityModeOfPayment.disabled = false;
+                reservationRow.style.display = "none";
+                reservationRow2.style.display = "none";
             }
-            
-            updateReceipt();
         }
 
         function addGroup() {
@@ -601,17 +672,37 @@
                 name.style.borderColor = '#ccc';
             }
             
-            // Validate reservation amount
-            const reservationAmount = document.getElementById('reservationAmount');
-            const reservationError = document.getElementById('reservationError');
-            const reservationValue = reservationAmount.value.replace(/,/g, '');
-            if (!reservationValue || isNaN(reservationValue) || parseFloat(reservationValue) <= 0) {
-                reservationError.style.display = 'block';
-                reservationAmount.style.borderColor = 'red';
-                isValid = false;
-            } else {
-                reservationError.style.display = 'none';
-                reservationAmount.style.borderColor = '#ccc';
+            // Validate payment type specific fields
+            const paymentType = document.querySelector('input[name="paymentType"]:checked').value;
+            
+            if (paymentType === 'reservation' || paymentType === 'both') {
+                // Validate reservation amount
+                const reservationAmount = document.getElementById('reservationAmount');
+                const reservationError = document.getElementById('reservationError');
+                const reservationValue = reservationAmount.value.replace(/,/g, '');
+                if (!reservationValue || isNaN(reservationValue) || parseFloat(reservationValue) <= 0) {
+                    reservationError.style.display = 'block';
+                    reservationAmount.style.borderColor = 'red';
+                    isValid = false;
+                } else {
+                    reservationError.style.display = 'none';
+                    reservationAmount.style.borderColor = '#ccc';
+                }
+            }
+            
+            if (paymentType === 'equity' || paymentType === 'both') {
+                // Validate equity amount
+                const equity = document.getElementById('equity');
+                const equityError = document.getElementById('equityError');
+                const equityValue = equity.value.replace(/,/g, '');
+                if (!equityValue || isNaN(equityValue) || parseFloat(equityValue) <= 0) {
+                    equityError.style.display = 'block';
+                    equity.style.borderColor = 'red';
+                    isValid = false;
+                } else {
+                    equityError.style.display = 'none';
+                    equity.style.borderColor = '#ccc';
+                }
             }
             
             // Validate date
@@ -662,19 +753,6 @@
                 group.style.borderColor = '#ccc';
             }
             
-            // Validate equity if provided
-            const equity = document.getElementById('equity');
-            const equityError = document.getElementById('equityError');
-            const equityValue = equity.value.replace(/,/g, '');
-            if (equityValue && (isNaN(equityValue) || parseFloat(equityValue) < 0)) {
-                equityError.style.display = 'block';
-                equity.style.borderColor = 'red';
-                isValid = false;
-            } else {
-                equityError.style.display = 'none';
-                equity.style.borderColor = '#ccc';
-            }
-            
             if (isValid) {
                 window.print();
             } else {
@@ -689,8 +767,8 @@
             const formattedDate = today.toISOString().substr(0, 10);
             document.getElementById('date').value = formattedDate;
             
-            // Initialize the equity mode of payment
-            syncPaymentModes();
+            // Initialize payment type display
+            togglePaymentType();
             
             // Update receipt
             updateReceipt();
