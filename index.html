@@ -269,13 +269,17 @@
                 </div>
                 <div class="input-group" id="reservationAmountGroup">
                     <label for="reservationAmount">Reservation Amount:</label>
-                    <input type="text" id="reservationAmount" placeholder="Enter Reservation Amount" oninput="validateNumber(this, 'reservationError'); updateReceipt()">
-                    <div class="error" id="reservationError">Please enter a valid number</div>
+                    <input type="text" id="reservationAmount" placeholder="Enter Reservation Amount" 
+                           oninput="formatCurrencyInput(this, 'reservationError'); updateReceipt()"
+                           onblur="formatCurrencyBlur(this)">
+                    <div class="error" id="reservationError">Please enter a valid amount</div>
                 </div>
                 <div class="input-group" id="equityAmountGroup">
                     <label for="equity">Equity Amount:</label>
-                    <input type="text" id="equity" placeholder="Enter Equity Amount" oninput="validateNumber(this, 'equityError'); updateReceipt()">
-                    <div class="error" id="equityError">Please enter a valid number</div>
+                    <input type="text" id="equity" placeholder="Enter Equity Amount" 
+                           oninput="formatCurrencyInput(this, 'equityError'); updateReceipt()"
+                           onblur="formatCurrencyBlur(this)">
+                    <div class="error" id="equityError">Please enter a valid amount</div>
                 </div>
                 <div class="input-group">
                     <label for="date">Date:</label>
@@ -370,13 +374,13 @@
                     <tbody>
                         <tr id="reservationRow">
                             <td id="tableModeOfPayment">[Mode of Payment]</td>
-                            <td id="tableReservationAmount">[Reservation Amount]</td>
+                            <td id="tableReservationAmount" class="amount-cell">[Reservation Amount]</td>
                             <td id="tableParticular">RESERVATION PAYMENT <span id="dynamicParticular">[Particular]</span></td>
                             <td id="tableDate">[Date]</td>
                         </tr>
                         <tr id="equityRow" style="display: none;">
                             <td id="tableEquityModeOfPayment">[Mode of Payment]</td>
-                            <td id="tableEquityAmount">[Equity Amount]</td>
+                            <td id="tableEquityAmount" class="amount-cell">[Equity Amount]</td>
                             <td id="tableEquityParticular">EQUITY</td>
                             <td id="tableEquityDate">[Date]</td>
                         </tr>
@@ -426,13 +430,13 @@
                     <tbody>
                         <tr id="reservationRow2">
                             <td id="tableModeOfPayment2">[Mode of Payment]</td>
-                            <td id="tableReservationAmount2">[Reservation Amount]</td>
+                            <td id="tableReservationAmount2" class="amount-cell">[Reservation Amount]</td>
                             <td id="tableParticular2">RESERVATION PAYMENT <span id="dynamicParticular2">[Particular]</span></td>
                             <td id="tableDate2">[Date]</td>
                         </tr>
                         <tr id="equityRow2" style="display: none;">
                             <td id="tableEquityModeOfPayment2">[Mode of Payment]</td>
-                            <td id="tableEquityAmount2">[Equity Amount]</td>
+                            <td id="tableEquityAmount2" class="amount-cell">[Equity Amount]</td>
                             <td id="tableEquityParticular2">EQUITY</td>
                             <td id="tableEquityDate2">[Date]</td>
                         </tr>
@@ -468,6 +472,69 @@
     </div>
 
     <script>
+        // Currency formatting functions
+        function formatCurrencyInput(input, errorId) {
+            const errorElement = document.getElementById(errorId);
+            let value = input.value;
+            
+            // Remove all non-digit characters except decimal point
+            value = value.replace(/[^\d.]/g, '');
+            
+            // Ensure only one decimal point
+            const parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+            
+            // Limit to 2 decimal places
+            if (parts.length === 2 && parts[1].length > 2) {
+                value = parts[0] + '.' + parts[1].substring(0, 2);
+            }
+            
+            input.value = value;
+            
+            // Validate
+            if (value && isNaN(parseFloat(value))) {
+                errorElement.style.display = 'block';
+                input.style.borderColor = 'red';
+                return false;
+            } else {
+                errorElement.style.display = 'none';
+                input.style.borderColor = '#ccc';
+                return true;
+            }
+        }
+        
+        function formatCurrencyBlur(input) {
+            let value = input.value;
+            
+            if (value && !isNaN(parseFloat(value))) {
+                // Format with Philippine Peso symbol and commas
+                const numValue = parseFloat(value);
+                input.value = `₱ ${numValue.toLocaleString('en-PH', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                })}`;
+            }
+        }
+        
+        function parseCurrencyToNumber(currencyString) {
+            if (!currencyString) return 0;
+            
+            // Remove currency symbol and commas
+            const cleanString = currencyString.replace(/[₱,]/g, '').trim();
+            return parseFloat(cleanString) || 0;
+        }
+        
+        function formatCurrencyForDisplay(amount) {
+            if (!amount || amount === 0) return "₱ 0.00";
+            
+            return `₱ ${amount.toLocaleString('en-PH', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })}`;
+        }
+
         function togglePaymentType() {
             const paymentType = document.querySelector('input[name="paymentType"]:checked').value;
             const reservationAmountGroup = document.getElementById('reservationAmountGroup');
@@ -539,9 +606,9 @@
             // Format the date
             const formattedDate = date ? new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase() : "[Date]";
 
-            // Convert amounts to numbers
-            const reservationAmountNum = parseFloat(reservationAmount.replace(/,/g, '')) || 0;
-            const equityNum = parseFloat(equity.replace(/,/g, '')) || 0;
+            // Convert currency strings to numbers
+            const reservationAmountNum = parseCurrencyToNumber(reservationAmount);
+            const equityNum = parseCurrencyToNumber(equity);
 
             // Calculate total amount based on selected payment type
             let totalAmount = 0;
@@ -553,10 +620,10 @@
                 totalAmount = reservationAmountNum + equityNum;
             }
 
-            // Add Philippine Peso sign (₱) to the amounts
-            const formattedReservationAmount = reservationAmountNum ? `₱ ${reservationAmountNum.toLocaleString()}` : "[Reservation Amount]";
-            const formattedEquity = equityNum ? `₱ ${equityNum.toLocaleString()}` : "[Equity Amount]";
-            const formattedTotalAmount = totalAmount ? `₱ ${totalAmount.toLocaleString()}` : "[Amount]";
+            // Format amounts as Philippine currency
+            const formattedReservationAmount = formatCurrencyForDisplay(reservationAmountNum);
+            const formattedEquity = formatCurrencyForDisplay(equityNum);
+            const formattedTotalAmount = formatCurrencyForDisplay(totalAmount);
 
             // Update the receipt content
             const fullName = `${salutation} ${name}`;
@@ -637,26 +704,6 @@
             }
         }
 
-        function validateNumber(input, errorId) {
-            const errorElement = document.getElementById(errorId);
-            const value = input.value.replace(/,/g, '');
-            
-            if (value && isNaN(value)) {
-                errorElement.style.display = 'block';
-                input.style.borderColor = 'red';
-                return false;
-            } else {
-                errorElement.style.display = 'none';
-                input.style.borderColor = '#ccc';
-                
-                // Format with commas if it's a valid number
-                if (value && !isNaN(value)) {
-                    input.value = Number(value).toLocaleString();
-                }
-                return true;
-            }
-        }
-
         function validateAndPrint() {
             let isValid = true;
             
@@ -679,8 +726,8 @@
                 // Validate reservation amount
                 const reservationAmount = document.getElementById('reservationAmount');
                 const reservationError = document.getElementById('reservationError');
-                const reservationValue = reservationAmount.value.replace(/,/g, '');
-                if (!reservationValue || isNaN(reservationValue) || parseFloat(reservationValue) <= 0) {
+                const reservationValue = parseCurrencyToNumber(reservationAmount.value);
+                if (!reservationValue || reservationValue <= 0) {
                     reservationError.style.display = 'block';
                     reservationAmount.style.borderColor = 'red';
                     isValid = false;
@@ -694,8 +741,8 @@
                 // Validate equity amount
                 const equity = document.getElementById('equity');
                 const equityError = document.getElementById('equityError');
-                const equityValue = equity.value.replace(/,/g, '');
-                if (!equityValue || isNaN(equityValue) || parseFloat(equityValue) <= 0) {
+                const equityValue = parseCurrencyToNumber(equity.value);
+                if (!equityValue || equityValue <= 0) {
                     equityError.style.display = 'block';
                     equity.style.borderColor = 'red';
                     isValid = false;
